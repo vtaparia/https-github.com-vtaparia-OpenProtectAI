@@ -53,6 +53,10 @@ function getChatInstance(): Chat {
 }
 
 export async function getChatResponse(prompt: string) {
+  // FIX: Add validation to ensure prompt is a non-empty string.
+  if (typeof prompt !== 'string' || !prompt.trim()) {
+    throw new Error('Invalid prompt provided to getChatResponse.');
+  }
   try {
     const chatInstance = getChatInstance();
     const result = await chatInstance.sendMessageStream({ message: prompt });

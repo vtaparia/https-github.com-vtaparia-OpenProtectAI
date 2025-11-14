@@ -11,6 +11,7 @@ import { sha256 } from './utils/hashing';
 import DeploymentModal from './components/DeploymentModal';
 import DashboardView from './components/DashboardView';
 import DetailView from './components/DetailView';
+import SettingsModal from './components/SettingsModal';
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
     {
@@ -199,6 +200,7 @@ const App: React.FC = () => {
     const [agentKnowledgeLevel, setAgentKnowledgeLevel] = useState(15);
     const [contextualThreatTracker, setContextualThreatTracker] = useState<Record<string, { count: number; threats: Set<string> }>>({});
     const [isDeploymentModalOpen, setIsDeploymentModalOpen] = useState(false);
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [selectedDetailItem, setSelectedDetailItem] = useState<AllEventTypes | null>(null);
     const intervalRef = useRef<number | undefined>();
 
@@ -271,7 +273,7 @@ const App: React.FC = () => {
             });
         }
 
-    }, [pushServerEvent]);
+    }, [pushServerEvent, setKnowledgeLevel, setContextualThreatTracker]);
 
     const pushKnowledgeSync = useCallback(() => {
         const version = `${new Date().getFullYear()}.${Date.now()}`;
@@ -317,7 +319,11 @@ const App: React.FC = () => {
 
         }, 3000);
 
-        return () => window.clearInterval(intervalRef.current);
+        return () => {
+            if (intervalRef.current) {
+                window.clearInterval(intervalRef.current);
+            }
+        };
     }, [processAlert, pushDirective, pushKnowledgeSync, knowledgeLevel, agentKnowledgeLevel]);
 
 
@@ -367,6 +373,7 @@ const App: React.FC = () => {
                                 agentKnowledgeLevel={agentKnowledgeLevel}
                                 serverEvents={serverEvents}
                                 onDeployClick={() => setIsDeploymentModalOpen(true)}
+                                onSettingsClick={() => setIsSettingsModalOpen(true)}
                             />
                         )}
                     </div>
@@ -386,6 +393,10 @@ const App: React.FC = () => {
             <DeploymentModal 
                 isOpen={isDeploymentModalOpen} 
                 onClose={() => setIsDeploymentModalOpen(false)} 
+            />
+            <SettingsModal 
+                isOpen={isSettingsModalOpen} 
+                onClose={() => setIsSettingsModalOpen(false)} 
             />
         </>
     );

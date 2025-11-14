@@ -1,15 +1,18 @@
+
 import React from 'react';
 import AgentKnowledgeMeter from './AgentKnowledgeMeter';
 import ServerKnowledgeMeter from './ServerKnowledgeMeter';
 import ThreatHeatmap from './ThreatHeatmap';
 import { ServerEvent } from '../types';
 import { DeployIcon } from './icons/DeployIcon';
+import { SettingsIcon } from './icons/SettingsIcon';
 
 interface DashboardViewProps {
   serverKnowledgeLevel: number;
   agentKnowledgeLevel: number;
   serverEvents: ServerEvent[];
   onDeployClick: () => void;
+  onSettingsClick: () => void;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -17,19 +20,30 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   agentKnowledgeLevel,
   serverEvents,
   onDeployClick,
+  onSettingsClick,
 }) => {
   return (
     <div className="p-4 flex-1 overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-100">Intelligence Dashboard</h2>
-            <button 
-                onClick={onDeployClick}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-semibold bg-cyan-600 hover:bg-cyan-500 rounded-md transition-colors shadow-lg shadow-cyan-600/20"
-                title="Deploy New Agent"
-            >
-                <DeployIcon />
-                Deploy Agent
-            </button>
+            <div className="flex items-center gap-2">
+                 <button 
+                    onClick={onSettingsClick}
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-semibold bg-slate-600 hover:bg-slate-500 rounded-md transition-colors"
+                    title="Configure Agent Settings"
+                >
+                    <SettingsIcon />
+                    Agent Settings
+                </button>
+                <button 
+                    onClick={onDeployClick}
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-semibold bg-cyan-600 hover:bg-cyan-500 rounded-md transition-colors shadow-lg shadow-cyan-600/20"
+                    title="Deploy New Agent"
+                >
+                    <DeployIcon />
+                    Deploy Agent
+                </button>
+            </div>
         </div>
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
