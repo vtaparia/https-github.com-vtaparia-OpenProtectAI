@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AgentKnowledgeMeter from './AgentKnowledgeMeter';
 import ServerKnowledgeMeter from './ServerKnowledgeMeter';
@@ -16,6 +15,7 @@ interface DashboardViewProps {
   correlationActivity: number[];
   onDeployClick: () => void;
   onSettingsClick: () => void;
+  onKnowledgeMeterClick: () => void;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -25,6 +25,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   correlationActivity,
   onDeployClick,
   onSettingsClick,
+  onKnowledgeMeterClick,
 }) => {
   return (
     <div className="p-4 flex-1 overflow-y-auto">
@@ -52,7 +53,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                    <ServerKnowledgeMeter level={serverKnowledgeLevel} />
+                    <ServerKnowledgeMeter level={serverKnowledgeLevel} onClick={onKnowledgeMeterClick} />
                 </div>
                 <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                     <AgentKnowledgeMeter level={agentKnowledgeLevel} />

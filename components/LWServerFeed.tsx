@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 // FIX: Import `AllEventTypes` to use in the `onSelectItem` prop type.
 import { ServerEvent, AllEventTypes } from '../types';
@@ -23,7 +24,9 @@ const ServerBrainFeed: React.FC<ServerBrainFeedProps> = ({ events, knowledgeLeve
       </header>
       
       <div className="p-4 border-b border-gray-700">
-        <ServerKnowledgeMeter level={knowledgeLevel} />
+        {/* FIX: The ServerKnowledgeMeter component requires an 'onClick' prop. 
+            Providing a no-op function to satisfy the requirement as the parent component does not provide a handler. */}
+        <ServerKnowledgeMeter level={knowledgeLevel} onClick={() => {}} />
       </div>
 
       <div className="flex-1 overflow-y-auto p-2 space-y-2">

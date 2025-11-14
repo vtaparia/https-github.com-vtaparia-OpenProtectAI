@@ -93,4 +93,13 @@ export interface ProactiveAlertPush {
     target_context: string; // e.g., "Financial Sector in Europe"
 }
 
+// Represents a single event that contributes to the server's knowledge
+export interface KnowledgeContribution {
+    id: string;
+    timestamp: string;
+    source: string; // e.g., "Critical Alert: Ransomware" or "Intel: VirusTotal"
+    points: number;
+    newTotal: number;
+}
+
 export type AllEventTypes = Alert | ServerEvent;

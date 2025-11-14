@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChatMessage, MessageRole, Alert, AlertSeverity, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, AlertContext } from './types';
+import { ChatMessage, MessageRole, Alert, AlertSeverity, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, AlertContext, KnowledgeContribution } from './types';
 import { getChatResponse } from './services/geminiService';
 import Header from './components/Header';
 import ResponseDisplay from './components/ResponseDisplay';
@@ -12,6 +12,7 @@ import DashboardView from './components/DashboardView';
 import DetailView from './components/DetailView';
 import SettingsModal from './components/SettingsModal';
 import PromptInput from './components/PromptInput';
+import LearningAnalyticsModal from './components/LearningAnalyticsModal';
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
     {
@@ -139,10 +140,27 @@ const App: React.FC = () => {
   const [isDeploymentModalOpen, setIsDeploymentModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState<AllEventTypes | null>(null);
+  const [learningLog, setLearningLog] = useState<KnowledgeContribution[]>([]);
+  const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false);
   
   const [contextualThreatTracker, setContextualThreatTracker] = useState<Record<string, { count: number, threats: Set<string> }>>({});
 
   const intervalRef = useRef<number>();
+
+  const updateServerKnowledge = useCallback((gain: number, source: string) => {
+    setServerKnowledgeLevel(prev => {
+        const newTotal = Math.min(100, prev + gain);
+        const newContribution: KnowledgeContribution = {
+            id: `kc-${Date.now()}`,
+            timestamp: new Date().toLocaleTimeString(),
+            source,
+            points: newTotal - prev,
+            newTotal
+        };
+        setLearningLog(prevLog => [newContribution, ...prevLog.slice(0, 99)]);
+        return newTotal;
+    });
+  }, []);
 
   const processAlert = useCallback(async (alert: Alert) => {
     // 1. Sanitize & Aggregate (Simulate LWServer)
@@ -182,7 +200,7 @@ const App: React.FC = () => {
     // High-impact detections give more knowledge
     if(alert.title === 'In-Memory Threat Detected') knowledgeGain *= 1.5;
 
-    setServerKnowledgeLevel(prev => Math.min(100, prev + knowledgeGain));
+    updateServerKnowledge(knowledgeGain, `${alert.severity} Alert: ${alert.title}`);
     setCorrelationActivity(prev => [...prev.slice(1), activitySpike]);
 
     // Contextual Threat Tracking
@@ -200,7 +218,7 @@ const App: React.FC = () => {
         });
     }
 
-  }, []);
+  }, [updateServerKnowledge]);
 
   useEffect(() => {
     // Main simulation loop
@@ -228,7 +246,7 @@ const App: React.FC = () => {
           payload: intel,
         };
         setServerEvents(prev => [newEvent, ...prev]);
-        setServerKnowledgeLevel(prev => Math.min(100, prev + 0.3));
+        updateServerKnowledge(0.3, `Intel: ${intel.source}`);
         setCorrelationActivity(prev => [...prev.slice(1), 5]); // Intel ingestion causes activity
       }
       
@@ -269,7 +287,7 @@ const App: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [processAlert, agentKnowledgeLevel, serverKnowledgeLevel, contextualThreatTracker]);
+  }, [processAlert, agentKnowledgeLevel, serverKnowledgeLevel, contextualThreatTracker, updateServerKnowledge]);
 
   const handleSend = async (prompt: string) => {
     setIsLoading(true);
@@ -281,7 +299,8 @@ const App: React.FC = () => {
       setChatHistory((prev) => [...prev, { role: MessageRole.MODEL, content: "" }]);
 
       for await (const chunk of stream) {
-        fullResponse += chunk.text();
+        // FIX: Per @google/genai guidelines, the response text is accessed via the .text property, not the .text() method.
+        fullResponse += chunk.text;
         setChatHistory((prev) => {
           const newHistory = [...prev];
           newHistory[newHistory.length - 1].content = fullResponse;
@@ -320,6 +339,7 @@ const App: React.FC = () => {
                     correlationActivity={correlationActivity}
                     onDeployClick={() => setIsDeploymentModalOpen(true)}
                     onSettingsClick={() => setIsSettingsModalOpen(true)}
+                    onKnowledgeMeterClick={() => setIsAnalyticsModalOpen(true)}
                 />
             )}
         </div>
@@ -336,6 +356,11 @@ const App: React.FC = () => {
       
       <DeploymentModal isOpen={isDeploymentModalOpen} onClose={() => setIsDeploymentModalOpen(false)} />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
+      <LearningAnalyticsModal 
+        isOpen={isAnalyticsModalOpen} 
+        onClose={() => setIsAnalyticsModalOpen(false)} 
+        log={learningLog} 
+      />
 
     </div>
   );
