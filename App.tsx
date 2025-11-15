@@ -13,6 +13,7 @@ import NavigationSidebar, { View as NavigationView } from './components/Navigati
 import AgentFleetView from './components/AgentFleetView';
 import ServerIntelligenceView from './components/ServerIntelligenceView';
 import DeploymentModal from './components/DeploymentModal';
+import ReleaseNotesModal from './components/ReleaseNotesModal';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -137,6 +138,7 @@ const App: React.FC = () => {
     const [isDeploymentModalOpen, setDeploymentModalOpen] = useState(false);
     const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
     const [isAnalyticsModalOpen, setAnalyticsModalOpen] = useState(false);
+    const [isReleaseNotesModalOpen, setReleaseNotesModalOpen] = useState(false);
     const [selectedDetailItem, setSelectedDetailItem] = useState<AllEventTypes | null>(null);
     const [contextualThreatTracker, setContextualThreatTracker] = useState<Record<string, { count: number; titles: Set<string> }>>({});
     const [correlationActivity, setCorrelationActivity] = useState<number[]>(new Array(20).fill(0));
@@ -150,7 +152,8 @@ const App: React.FC = () => {
             const newTotal = Math.min(100, currentLevel + points);
             const newEntry: KnowledgeContribution = {
                 id: `log-${Date.now()}-${Math.random()}`,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                // FIX: Replaced [] with undefined for broader environment compatibility.
+                timestamp: new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                 source,
                 points,
                 newTotal,
@@ -241,14 +244,14 @@ const App: React.FC = () => {
 
         setCorrelationActivity(prev => [...prev.slice(1), activitySpike]);
 
-    // FIX: Added `logKnowledgeContribution` to the dependency array of useCallback, as it's used within the function. This follows React's hook rules and prevents potential stale closures.
     }, [logKnowledgeContribution]);
 
     const pushKnowledgeSync = useCallback(() => {
         const syncEvent: ServerEvent = {
             id: `se-${Date.now()}-sync`,
             type: 'KNOWLEDGE_SYNC',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            // FIX: Replaced [] with undefined for broader environment compatibility.
+            timestamp: new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
             payload: {
                 description: 'Pushed latest threat intelligence models and IOCs to fleet.',
                 version: `v${(agentKnowledgeLevel + 0.1).toFixed(2)}`
@@ -269,7 +272,8 @@ const App: React.FC = () => {
                 const newAlert: Alert = {
                     ...sample,
                     id: `alert-${now.getTime()}`,
-                    timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    // FIX: Replaced [] with undefined for broader environment compatibility.
+                    timestamp: now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                 };
                 setAlerts(prev => [newAlert, ...prev].slice(0, 50));
                 processAlert(newAlert);
@@ -280,7 +284,8 @@ const App: React.FC = () => {
                 const learningEvent: ServerEvent = {
                     id: `se-${now.getTime()}`,
                     type: 'LEARNING_UPDATE',
-                    timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    // FIX: Replaced [] with undefined for broader environment compatibility.
+                    timestamp: now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                     payload: source as LearningUpdate,
                 };
                 setServerEvents(prev => [...prev, learningEvent]);
@@ -295,7 +300,8 @@ const App: React.FC = () => {
                      const proactiveAlert: ServerEvent = {
                         id: `se-${now.getTime()}-proactive`,
                         type: 'PROACTIVE_ALERT_PUSH',
-                        timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                        // FIX: Replaced [] with undefined for broader environment compatibility.
+                        timestamp: now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                         payload: {
                             title: `Heightened Threat Activity Detected`,
                             threat_summary: `Correlated multiple threats targeting the ${industry} industry in ${region}. Threats include: ${Array.from(data.titles).join(', ')}.`,
@@ -323,7 +329,8 @@ const App: React.FC = () => {
                 window.clearInterval(intervalRef.current);
             }
         };
-    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync]);
+    // FIX: Add logKnowledgeContribution to dependency array to prevent stale closures.
+    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync, logKnowledgeContribution]);
 
 
     const handleSend = async (prompt: string) => {
@@ -391,7 +398,7 @@ const App: React.FC = () => {
 
     return (
         <div className="h-screen w-screen flex flex-col bg-slate-900 text-gray-200 font-sans">
-            <Header />
+            <Header onVersionClick={() => setReleaseNotesModalOpen(true)} />
             <main className="flex-1 flex overflow-hidden">
                 <NavigationSidebar 
                     activeView={activeView} 
@@ -413,6 +420,7 @@ const App: React.FC = () => {
             <DeploymentModal isOpen={isDeploymentModalOpen} onClose={() => setDeploymentModalOpen(false)} />
             <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
             <LearningAnalyticsModal isOpen={isAnalyticsModalOpen} onClose={() => setAnalyticsModalOpen(false)} log={learningLog} />
+            <ReleaseNotesModal isOpen={isReleaseNotesModalOpen} onClose={() => setReleaseNotesModalOpen(false)} />
         </div>
     );
 };
