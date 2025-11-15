@@ -1,4 +1,5 @@
 
+
 # OpenProtectAI
 
 A dynamic, enterprise-ready admin console that simulates an AI-powered, self-learning cybersecurity platform, complete with an expert AI assistant for real-time architectural design and guidance.
@@ -82,9 +83,25 @@ graph TD
     LW -- "Pushes Updates" --> A3
 ```
 
+## Extensibility: Using Different LLM Backends
+
+This application is designed to be flexible. While it defaults to using the Google Gemini API, the AI service is isolated, making it easy for developers to switch to other Large Language Models.
+
+**Secure API Key Management:** For security reasons, API keys are **not** managed through the UI. They must be configured in the server's environment. The UI provides a "Re-initialize AI Connection" button in the settings panel, which allows the application to pick up a newly updated environment variable without a full restart.
+
+**To switch the LLM provider:**
+
+1.  Navigate to `services/geminiService.ts`.
+2.  This file contains a modular framework with commented-out examples for connecting to:
+    -   **Groq:** A high-speed inference service for open-source models.
+    -   **Ollama:** A tool for running open-source models (like Gemma or Llama) locally on your own machine.
+3.  Comment out the active Gemini implementation and activate the implementation for your desired provider.
+4.  Update the server's environment variables to include the appropriate API key (e.g., `GROQ_API_KEY`).
+5.  Use the "Re-initialize" button in the settings panel to apply the change.
+
 ## Technology Stack
 
 -   **Frontend:** React, TypeScript
 -   **Styling:** Tailwind CSS
--   **AI Integration:** Google Gemini API
+-   **AI Integration:** Google Gemini API (with examples for Groq & Ollama)
 -   **Diagramming:** Mermaid.js

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
-import { getChatResponse } from './services/geminiService';
+import { getChatResponse, reinitializeChat, getActiveProvider } from './services/geminiService';
 import Header from './components/Header';
 import { sha256 } from './utils/hashing';
 import DashboardView from './components/DashboardView';
@@ -170,7 +170,8 @@ const App: React.FC = () => {
             setLearningLog(prevLog => [newEntry, ...prevLog].slice(0, 100)); // Keep last 100 entries
             return newTotal;
         });
-    }, [setKnowledgeLevel, setLearningLog]);
+    // FIX: The dependency array for useCallback should be empty when only using state setters, as they are guaranteed to be stable. This can prevent subtle bugs related to stale closures or unnecessary re-creations of the function.
+    }, []);
 
     const processAlert = useCallback(async (alert: Alert) => {
         const sanitized_data: Record<string, any> = {};
@@ -347,8 +348,7 @@ const App: React.FC = () => {
             setChatHistory(prev => [...prev, { role: MessageRole.MODEL, content: '' }]);
 
             for await (const chunk of stream) {
-                // FIX: The streaming response chunk returns a `text()` method, not a property. Calling it as a function.
-                modelResponse += chunk.text();
+                modelResponse += chunk.text;
                 setChatHistory(prev => {
                     const newHistory = [...prev];
                     newHistory[newHistory.length - 1].content = modelResponse;
@@ -493,7 +493,12 @@ const App: React.FC = () => {
                 onSend={handleSend}
              />
             <DeploymentModal isOpen={isDeploymentModalOpen} onClose={() => setDeploymentModalOpen(false)} />
-            <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+            <SettingsModal 
+                isOpen={isSettingsModalOpen} 
+                onClose={() => setSettingsModalOpen(false)}
+                activeProvider={getActiveProvider()}
+                onReinitialize={reinitializeChat}
+            />
             <LearningAnalyticsModal isOpen={isAnalyticsModalOpen} onClose={() => setAnalyticsModalOpen(false)} log={learningLog} />
             <ReleaseNotesModal isOpen={isReleaseNotesModalOpen} onClose={() => setReleaseNotesModalOpen(false)} />
             <AgentUpgradeModal 

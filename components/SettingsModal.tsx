@@ -1,17 +1,22 @@
 
+
 import React, { useState } from 'react';
+import { RefreshIcon } from './icons/RefreshIcon';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  activeProvider: string;
+  onReinitialize: () => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeProvider, onReinitialize }) => {
   const [scanFrequency, setScanFrequency] = useState('4h');
   const [logVerbosity, setLogVerbosity] = useState('Normal');
   const [sensitivity, setSensitivity] = useState(2);
   const [syncing, setSyncing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [reinitClicked, setReinitClicked] = useState(false);
 
   if (!isOpen) {
     return null;
@@ -34,6 +39,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
         setSyncing(false);
     }, 2000);
   };
+
+  const handleReinitialize = () => {
+    onReinitialize();
+    setReinitClicked(true);
+    setTimeout(() => setReinitClicked(false), 2000);
+  }
   
   const sensitivityLabels = ['Low', 'Medium', 'High', 'Very High'];
 
@@ -52,6 +63,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
         </header>
 
         <main className="p-6 space-y-6">
+            <div className="border-b border-gray-700 pb-6">
+                <h3 className="text-base font-semibold text-gray-300 mb-3">AI Service Configuration</h3>
+                <div className="bg-slate-900/50 p-3 rounded-lg space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400">Current AI Provider:</span>
+                        <span className="font-bold text-cyan-400">{activeProvider}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                        To switch providers (e.g., to Groq or Ollama) or update an API key, modify the server's environment variables and re-initialize the connection.
+                    </p>
+                    <button
+                        onClick={handleReinitialize}
+                        className="w-full flex justify-center items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-200 bg-slate-600 hover:bg-slate-500 rounded-md transition-colors"
+                    >
+                        <RefreshIcon />
+                        {reinitClicked ? 'Connection Reset!' : 'Re-initialize AI Connection'}
+                    </button>
+                </div>
+            </div>
             <div>
                 <label htmlFor="scan-frequency" className="block text-sm font-medium text-gray-300 mb-1">Active Scan Frequency</label>
                 <select 
