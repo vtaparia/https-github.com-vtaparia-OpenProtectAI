@@ -90,12 +90,34 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                         </div>
                     );
                 }
+                case 'DIRECTIVE_PUSH': {
+                    const payload = event.payload as DirectivePush;
+                    const { directive } = payload;
+                    let title = "Directive Pushed";
+                    let description = "A generic server directive was pushed to the agent fleet.";
+
+                    if (directive.type === 'AGENT_UPGRADE') {
+                        title = "Agent Upgrade Initiated";
+                        description = `Server commanded agents to upgrade to version ${directive.version}.`;
+                    }
+                    return (
+                       <div>
+                            <h3 className="text-lg font-bold text-cyan-400 mb-2">{title}</h3>
+                            <p className="text-sm text-gray-400 mb-4">{description}</p>
+                            <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                               <h4 className="text-sm font-semibold text-gray-400 mb-2">Directive Payload</h4>
+                               <PayloadDetailsView payload={directive} />
+                            </div>
+                       </div>
+                   );
+                }
                 default: {
-                     const payload = event.payload as (DirectivePush | KnowledgeSync | ProactiveAlertPush);
+                     const payload = event.payload as (KnowledgeSync | ProactiveAlertPush);
+                     const genericPayload = payload as Record<string, any>;
                      return (
                         <div>
-                             <h3 className="text-lg font-bold text-gray-200 mb-2">{'title' in payload ? payload.title : 'Server Action'}</h3>
-                              <p className="text-sm text-gray-400 mb-4">{'description' in payload ? payload.description : ('threat_summary' in payload ? payload.threat_summary : '')}</p>
+                             <h3 className="text-lg font-bold text-gray-200 mb-2">{'title' in genericPayload ? genericPayload.title : 'Server Action'}</h3>
+                              <p className="text-sm text-gray-400 mb-4">{'description' in genericPayload ? genericPayload.description : ('threat_summary' in genericPayload ? genericPayload.threat_summary : '')}</p>
                              <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
                                 <h4 className="text-sm font-semibold text-gray-400 mb-2">Event Payload</h4>
                                 <PayloadDetailsView payload={payload} />

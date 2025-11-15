@@ -6,10 +6,12 @@ import AlertItem from './AlertItem';
 import PayloadDetailsView from './PayloadDetailsView';
 import { SortIcon } from './icons/SortIcon';
 import RemediationHistoryItem from './RemediationHistoryItem';
+import { UpgradeIcon } from './icons/UpgradeIcon';
 
 interface AgentFleetViewProps {
   alerts: Alert[];
   serverEvents: ServerEvent[];
+  onUpgradeClick: () => void;
 }
 
 const osIcons: Record<Device['os'], React.FC> = {
@@ -25,7 +27,7 @@ const osIcons: Record<Device['os'], React.FC> = {
 type SortKey = keyof Device | 'hostname';
 type SortDirection = 'asc' | 'desc';
 
-const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents }) => {
+const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, onUpgradeClick }) => {
   const [selectedAgent, setSelectedAgent] = useState<Device | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [osFilter, setOsFilter] = useState<Device['os'] | 'All'>('All');
@@ -116,7 +118,19 @@ const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents })
     <div className="flex-1 flex gap-4 overflow-hidden">
         <div className="w-2/3 flex flex-col overflow-hidden bg-slate-800/50 backdrop-blur-lg border border-slate-700/50 rounded-lg">
             <header className="p-4 border-b border-slate-700/50 shrink-0 space-y-3">
-                <h2 className="text-lg font-bold text-gray-100">Agent Fleet Management</h2>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-lg font-bold text-gray-100">Agent Fleet Management</h2>
+                    </div>
+                    <button
+                        onClick={onUpgradeClick}
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold bg-purple-600 hover:bg-purple-500 rounded-md transition-colors shadow-lg shadow-purple-600/20"
+                        title="Manage Agent Upgrades"
+                    >
+                        <UpgradeIcon />
+                        Upgrade Agents
+                    </button>
+                </div>
                 <div className="flex gap-4">
                     <input 
                         type="text"

@@ -81,11 +81,19 @@ export interface VulnerabilityDetails {
 }
 
 // Represents the server pushing new intelligence to agents
+export type AgentUpgradeDirective = {
+    type: 'AGENT_UPGRADE';
+    version: string;
+    target_os: Device['os'] | 'All';
+};
+
+// Add other directive types here in the future, e.g., | YaraUpdateDirective
+export type DirectivePayload = AgentUpgradeDirective;
+
 export interface DirectivePush {
-    title: string;
-    description: string;
-    target: 'All Agents' | 'Specific OS';
+    directive: DirectivePayload;
 }
+
 
 // Represents the server syncing its knowledge to the LWServer/Agents
 export interface KnowledgeSync {

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ServerEvent, DirectivePush, AllEventTypes } from '../types';
+import { ServerEvent, DirectivePush, AllEventTypes, AgentUpgradeDirective } from '../types';
 import { DirectiveIcon } from './icons/DirectiveIcon';
 
 interface DirectivePushItemProps {
@@ -9,6 +10,18 @@ interface DirectivePushItemProps {
 
 const DirectivePushItem: React.FC<DirectivePushItemProps> = ({ event, onSelectItem }) => {
   const payload = event.payload as DirectivePush;
+  const { directive } = payload;
+
+  let title = 'Directive Pushed';
+  let description = 'A generic directive was sent to agents.';
+  let details = 'General Update';
+
+  if (directive.type === 'AGENT_UPGRADE') {
+    const upgradeDirective = directive as AgentUpgradeDirective;
+    title = 'Agent Upgrade Initiated';
+    description = `Pushing upgrade to version ${upgradeDirective.version} for ${upgradeDirective.target_os} agents.`;
+    details = `Version: ${upgradeDirective.version}`;
+  }
 
   return (
     <div className="p-3 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border-l-4 border-cyan-500 overflow-hidden transition-colors duration-300 cursor-pointer"
@@ -18,11 +31,11 @@ const DirectivePushItem: React.FC<DirectivePushItemProps> = ({ event, onSelectIt
           <DirectiveIcon />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-bold text-cyan-300">{payload.title}</p>
-          <p className="text-xs text-gray-300 mt-1">{payload.description}</p>
+          <p className="text-sm font-bold text-cyan-300">{title}</p>
+          <p className="text-xs text-gray-300 mt-1">{description}</p>
           <div className="flex items-center justify-between mt-2">
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">
-              Target: {payload.target}
+              {details}
             </span>
             <span className="text-xs text-gray-500">{event.timestamp}</span>
           </div>
