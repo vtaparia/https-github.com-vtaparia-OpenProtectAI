@@ -23,6 +23,13 @@ export enum CaseStatus {
     RESOLVED = 'Resolved',
 }
 
+export interface Case {
+    status: CaseStatus;
+    alerts: Alert[];
+    assignee?: string;
+    resolution_notes?: string;
+}
+
 export interface Device {
     type: 'Desktop' | 'Server' | 'Mobile' | 'Laptop' | 'IoT Device' | 'Firewall' | 'Cloud VM' | 'Container';
     os: 'Windows' | 'Linux' | 'Android' | 'macOS' | 'Embedded Linux' | 'PAN-OS' | 'Ubuntu';

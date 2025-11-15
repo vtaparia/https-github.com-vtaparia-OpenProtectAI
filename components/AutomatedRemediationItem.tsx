@@ -27,7 +27,8 @@ const AutomatedRemediationItem: React.FC<AutomatedRemediationItemProps> = ({ eve
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300">
               Host: {payload.target_host}
             </span>
-            <span className="text-xs text-gray-500">{event.timestamp}</span>
+            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
           </div>
         </div>
       </div>

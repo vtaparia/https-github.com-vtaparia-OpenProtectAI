@@ -1,4 +1,5 @@
 
+
 # OpenProtectAI
 
 A dynamic, enterprise-ready admin console that simulates an AI-powered, self-learning cybersecurity platform, complete with an expert AI assistant for real-time architectural design and guidance.
@@ -22,7 +23,8 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 
 ### 3. Incident Response & Case Management
 - **One-Click Case Creation:** Analysts can create an investigation "Case" from any high or critical severity alert directly within the Agent Fleet view. This assigns a unique Case ID for tracking.
-- **Open Cases Dashboard:** The main dashboard includes a real-time summary of open cases by status (New, In Progress, Resolved), providing an at-a-glance overview of the SOC's active workload.
+- **Case Assignment Workflow:** New cases can be assigned to specific security analysts. Assigned cases automatically transition to an "In Progress" state, and the assignee is clearly displayed on the alert, creating a complete audit and accountability trail.
+- **Open Cases Dashboard:** The main dashboard includes a real-time summary of open cases by status (New / Unassigned, In Progress, Resolved), providing an at-a-glance overview of the SOC's active workload.
 
 ### 4. Real-Time Intelligence & Analytics
 - **Intelligence Dashboard:** The main dashboard provides a high-level overview with:

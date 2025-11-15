@@ -83,7 +83,8 @@ const LearningAnalyticsModal: React.FC<LearningAnalyticsModalProps> = ({ isOpen,
                          ) : (
                             log.map(entry => (
                                 <div key={entry.id} className="grid grid-cols-12 gap-2 p-1.5 rounded bg-slate-900/50">
-                                    <span className="col-span-2 text-gray-500">{entry.timestamp}</span>
+                                    {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+                                    <span className="col-span-2 text-gray-500">{new Date(entry.timestamp).toLocaleTimeString()}</span>
                                     <span className="col-span-7 text-gray-300 truncate" title={entry.source}>{entry.source}</span>
                                     <span className="col-span-1 text-green-400 text-right">+{entry.points.toFixed(2)}</span>
                                     <span className="col-span-2 text-cyan-400 text-right font-semibold">{entry.newTotal.toFixed(1)}%</span>

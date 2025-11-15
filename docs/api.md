@@ -3,14 +3,14 @@
 This document outlines the core APIs for the self-learning security platform. The endpoints are designed to be asynchronous, accepting data for processing into the main analysis pipeline.
 
 ## Authentication
-In a production environment, these endpoints must be protected. A recommended approach is to use mutual TLS (mTLS), where both the client (LWServer) and the server present client certificates to authenticate each other, aligning perfectly with a Zero Trust model.
+In a production environment, these endpoints must be protected. A recommended approach is to use mutual TLS (mTLS), where both the client (LWServer) and the server present client certificates to authenticate each other, aligning perfectly with a Zero Trust model. For user-facing actions like case assignment, standard OAuth 2.0 bearer tokens would be used.
 
 ---
 
 ```yaml
 openapi: 3.0.3
 info:
-  title: "Cyber Architect AI - Self-Learning Security Platform API"
+  title: "OpenProtectAI - Self-Learning Security Platform API"
   description: "API for the central cloud platform, handling agent telemetry ingestion, threat intelligence fusion, and C2 communications."
   version: "1.0.0"
 servers:
@@ -22,6 +22,8 @@ tags:
     description: Endpoints for agent telemetry data ingestion.
   - name: Threat Intelligence
     description: Endpoints for external threat intelligence feed ingestion.
+  - name: Case Management
+    description: Endpoints for managing incident response cases.
 
 paths:
   /v1/telemetry/process:
@@ -81,11 +83,74 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/cases/{caseId}/assign:
+    patch:
+      tags:
+        - Case Management
+      summary: "Assign a case to an analyst"
+      description: |
+        Assigns an analyst to an existing case and updates its status to 'In Progress'. 
+        This is an idempotent operation.
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          description: The unique identifier of the case.
+          schema:
+            type: string
+            example: "CASE-123456"
+      requestBody:
+        description: The analyst to assign to the case.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assignee_id:
+                  type: string
+                  description: "The unique ID of the security analyst."
+                  example: "analyst-alice"
+              required:
+                - assignee_id
+      responses:
+        '200':
+          description: "OK. The case has been successfully assigned."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+        '404':
+          description: "Not Found. The specified caseId does not exist."
+        '401':
+          description: "Unauthorized. The user does not have permission to assign cases."
+
 components:
   schemas:
     AlertSeverity:
       type: string
       enum: [Info, Medium, High, Critical]
+    
+    CaseStatus:
+      type: string
+      enum: [New, In Progress, Resolved]
+      
+    Case:
+      type: object
+      properties:
+        caseId:
+          type: string
+          example: "CASE-123456"
+        status:
+          $ref: '#/components/schemas/CaseStatus'
+        assignee_id:
+          type: string
+          example: "analyst-alice"
+        related_alerts:
+          type: array
+          items:
+            type: string
+            description: "Alert IDs related to this case."
 
     AlertContext:
       type: object

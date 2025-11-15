@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { ServerEvent, AutomatedRemediation } from '../types';
 import { RemediationIcon } from './icons/RemediationIcon';
@@ -20,7 +21,8 @@ const RemediationHistoryItem: React.FC<RemediationHistoryItemProps> = ({ event }
           <p className="text-xs font-bold text-orange-300">Response to: {payload.threat_name}</p>
           <p className="text-xs text-gray-300 mt-1">Actions: <span className="font-semibold">{payload.actions_taken.join(', ')}</span></p>
           <div className="flex items-center justify-end mt-1">
-            <span className="text-xs text-gray-500">{event.timestamp}</span>
+            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
           </div>
         </div>
       </div>

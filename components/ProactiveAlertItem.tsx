@@ -26,7 +26,8 @@ const ProactiveAlertItem: React.FC<ProactiveAlertItemProps> = ({ event, onSelect
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">
               Target: {payload.target_context}
             </span>
-            <span className="text-xs text-gray-500">{event.timestamp}</span>
+            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
           </div>
         </div>
       </div>

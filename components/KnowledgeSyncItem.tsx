@@ -26,7 +26,8 @@ const KnowledgeSyncItem: React.FC<KnowledgeSyncItemProps> = ({ event, onSelectIt
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
               Version: {payload.version}
             </span>
-            <span className="text-xs text-gray-500">{event.timestamp}</span>
+            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
           </div>
         </div>
       </div>

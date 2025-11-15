@@ -1,7 +1,7 @@
 
 
 import React, { useState, useMemo } from 'react';
-import { Alert, Device, ServerEvent, AutomatedRemediation, AlertSeverity } from '../types';
+import { Alert, Device, ServerEvent, AutomatedRemediation, AlertSeverity, Case, CaseStatus } from '../types';
 import { WindowsIcon, LinuxIcon, AppleIcon, AndroidIcon } from './icons/OSIcons';
 import AlertItem from './AlertItem';
 import PayloadDetailsView from './PayloadDetailsView';
@@ -9,12 +9,17 @@ import { SortIcon } from './icons/SortIcon';
 import RemediationHistoryItem from './RemediationHistoryItem';
 import { UpgradeIcon } from './icons/UpgradeIcon';
 import { CaseIcon } from './icons/CaseIcon';
+import { AssignIcon } from './icons/AssignIcon';
+import { ResolveIcon } from './icons/ResolveIcon';
 
 interface AgentFleetViewProps {
   alerts: Alert[];
   serverEvents: ServerEvent[];
+  cases: Map<string, Case>;
   onUpgradeClick: () => void;
   onCreateCase: (alert: Alert) => void;
+  onAssignCaseClick: (caseId: string) => void;
+  onResolveCaseClick: (caseId: string) => void;
 }
 
 const osIcons: Record<Device['os'], React.FC> = {
@@ -30,7 +35,7 @@ const osIcons: Record<Device['os'], React.FC> = {
 type SortKey = keyof Device | 'hostname';
 type SortDirection = 'asc' | 'desc';
 
-const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, onUpgradeClick, onCreateCase }) => {
+const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, cases, onUpgradeClick, onCreateCase, onAssignCaseClick, onResolveCaseClick }) => {
   const [selectedAgent, setSelectedAgent] = useState<Device | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [osFilter, setOsFilter] = useState<Device['os'] | 'All'>('All');
@@ -81,6 +86,7 @@ const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, o
             event.type === 'AUTOMATED_REMEDIATION' && 
             (event.payload as AutomatedRemediation).target_host === selectedAgent.hostname
         )
+        // FIX: Sort by parsing the ISO timestamp string to ensure correct chronological order.
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [selectedAgent, serverEvents]);
 
@@ -116,6 +122,58 @@ const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, o
         </div>
     </th>
   )
+
+  const renderCaseButton = (alert: Alert) => {
+    if (alert.caseId) {
+        const caseDetails = cases.get(alert.caseId);
+        if (caseDetails?.status === CaseStatus.RESOLVED) {
+            return (
+                <span className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-green-500/20 text-green-300">
+                    <ResolveIcon />
+                    Resolved
+                </span>
+            );
+        }
+        if (caseDetails?.assignee) {
+            return (
+                 <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold px-2 py-1 rounded-full bg-slate-600 text-gray-300">
+                        Assigned to: {caseDetails.assignee}
+                    </span>
+                    <button 
+                        onClick={() => onResolveCaseClick(alert.caseId!)}
+                        className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-green-600/40 hover:bg-green-600/60 text-green-200 transition-colors"
+                    >
+                        <ResolveIcon />
+                        Resolve
+                    </button>
+                </div>
+            );
+        }
+        return (
+            <button 
+                onClick={() => onAssignCaseClick(alert.caseId!)}
+                className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 transition-colors"
+            >
+                <AssignIcon />
+                Assign Case {alert.caseId}
+            </button>
+        );
+    }
+    
+    if (alert.severity === AlertSeverity.HIGH || alert.severity === AlertSeverity.CRITICAL) {
+        return (
+            <button 
+                onClick={() => onCreateCase(alert)}
+                className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 transition-colors"
+            >
+                <CaseIcon />
+                Create Case
+            </button>
+        );
+    }
+    return null;
+  };
 
   return (
     <div className="flex-1 flex gap-4 overflow-hidden">
@@ -208,21 +266,7 @@ const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, o
                                     <div key={alert.id} className="bg-slate-900/50 p-1 rounded-lg border border-transparent hover:border-slate-700">
                                         <AlertItem alert={alert} onSelectItem={() => setSelectedAlert(selectedAlert?.id === alert.id ? null : alert)} isExpanded={selectedAlert?.id === alert.id}/>
                                         <div className="px-3 pb-2 flex justify-end">
-                                        {alert.caseId ? (
-                                            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-green-500/20 text-green-300">
-                                                Case: {alert.caseId}
-                                            </span>
-                                        ) : (
-                                             (alert.severity === AlertSeverity.HIGH || alert.severity === AlertSeverity.CRITICAL) && (
-                                                <button 
-                                                    onClick={() => onCreateCase(alert)}
-                                                    className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 transition-colors"
-                                                >
-                                                    <CaseIcon />
-                                                    Create Case
-                                                </button>
-                                            )
-                                        )}
+                                            {renderCaseButton(alert)}
                                         </div>
                                     </div>
                                 ))}

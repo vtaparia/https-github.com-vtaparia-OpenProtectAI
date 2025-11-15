@@ -54,7 +54,8 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert, onSelectItem, isExpanded =
           <p className="text-xs text-gray-400 mt-1">{alert.description}</p>
           <div className="flex items-center justify-between mt-2">
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${config.bgColor} text-gray-300`}>{alert.severity}</span>
-            <span className="text-xs text-gray-500">{alert.timestamp}</span>
+            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+            <span className="text-xs text-gray-500">{new Date(alert.timestamp).toLocaleTimeString()}</span>
           </div>
         </div>
         <div className="flex-shrink-0">

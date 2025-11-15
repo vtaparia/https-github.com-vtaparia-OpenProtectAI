@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { ServerEvent, AggregatedEvent, AllEventTypes } from '../types';
 import { ServerIcon } from './icons/ServerIcon';
@@ -31,7 +32,8 @@ const LWServerEventItem: React.FC<LWServerEventItemProps> = ({ event, onSelectIt
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
               {payload.severity}
             </span>
-            <span className="text-xs text-gray-500">{event.timestamp}</span>
+            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import React from 'react';
 import AgentKnowledgeMeter from './AgentKnowledgeMeter';
 import ServerKnowledgeMeter from './ServerKnowledgeMeter';
 import ThreatHeatmap from './ThreatHeatmap';
-import { ServerEvent, CaseStatus } from '../types';
+import { ServerEvent, CaseStatus, Case } from '../types';
 import { DeployIcon } from './icons/DeployIcon';
 import { SettingsIcon } from './icons/SettingsIcon';
 import CorrelationActivityGraph from './CorrelationActivityGraph';
@@ -15,7 +15,7 @@ interface DashboardViewProps {
   agentKnowledgeLevel: number;
   serverEvents: ServerEvent[];
   correlationActivity: number[];
-  cases: Map<string, { status: CaseStatus; alerts: any[] }>;
+  cases: Map<string, Case>;
   onDeployClick: () => void;
   onSettingsClick: () => void;
   onKnowledgeMeterClick: () => void;
@@ -77,7 +77,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="flex justify-around items-center h-full">
                         <div className="text-center">
                             <p className="text-3xl font-bold text-red-400">{caseCounts[CaseStatus.NEW]}</p>
-                            <p className="text-xs text-gray-400">New</p>
+                            <p className="text-xs text-gray-400">New / Unassigned</p>
                         </div>
                         <div className="text-center">
                             <p className="text-3xl font-bold text-yellow-400">{caseCounts[CaseStatus.IN_PROGRESS]}</p>

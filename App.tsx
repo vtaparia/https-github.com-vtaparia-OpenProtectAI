@@ -1,9 +1,8 @@
 
 
 
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus } from './types';
+import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
 import { getChatResponse } from './services/geminiService';
 import Header from './components/Header';
 import { sha256 } from './utils/hashing';
@@ -18,6 +17,8 @@ import ServerIntelligenceView from './components/ServerIntelligenceView';
 import DeploymentModal from './components/DeploymentModal';
 import ReleaseNotesModal from './components/ReleaseNotesModal';
 import AgentUpgradeModal from './components/AgentUpgradeModal';
+import AssignCaseModal from './components/AssignCaseModal';
+import ResolveCaseModal from './components/ResolveCaseModal';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -132,18 +133,14 @@ const vulnerabilityIntelSources: LearningUpdate[] = [
     },
 ];
 
-interface Case {
-    status: CaseStatus;
-    alerts: Alert[];
-}
-
 const App: React.FC = () => {
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [serverEvents, setServerEvents] = useState<ServerEvent[]>([]);
-    // FIX: Provide an empty iterable to the Map constructor. While new Map() is valid, some environments or polyfills may incorrectly require an argument.
-    const [cases, setCases] = useState<Map<string, Case>>(new Map([]));
+    const [cases, setCases] = useState<Map<string, Case>>(() => new Map());
+    const [assignModalInfo, setAssignModalInfo] = useState<{ isOpen: boolean; caseId: string | null }>({ isOpen: false, caseId: null });
+    const [resolveModalInfo, setResolveModalInfo] = useState<{ isOpen: boolean; caseId: string | null }>({ isOpen: false, caseId: null });
     const [knowledgeLevel, setKnowledgeLevel] = useState(10);
     const [agentKnowledgeLevel, setAgentKnowledgeLevel] = useState(5);
     const [isDeploymentModalOpen, setDeploymentModalOpen] = useState(false);
@@ -164,7 +161,8 @@ const App: React.FC = () => {
             const newTotal = Math.min(100, currentLevel + points);
             const newEntry: KnowledgeContribution = {
                 id: `log-${Date.now()}-${Math.random()}`,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
+                timestamp: new Date().toISOString(),
                 source,
                 points,
                 newTotal,
@@ -261,7 +259,8 @@ const App: React.FC = () => {
         const syncEvent: ServerEvent = {
             id: `se-${Date.now()}-sync`,
             type: 'KNOWLEDGE_SYNC',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
+            timestamp: new Date().toISOString(),
             payload: {
                 description: 'Pushed latest threat intelligence models and IOCs to fleet.',
                 version: `v${(agentKnowledgeLevel + 0.1).toFixed(2)}`
@@ -282,7 +281,8 @@ const App: React.FC = () => {
                 const newAlert: Alert = {
                     ...sample,
                     id: `alert-${now.getTime()}`,
-                    timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
+                    timestamp: now.toISOString(),
                 };
                 setAlerts(prev => [newAlert, ...prev].slice(0, 50));
                 processAlert(newAlert);
@@ -293,7 +293,8 @@ const App: React.FC = () => {
                 const learningEvent: ServerEvent = {
                     id: `se-${now.getTime()}`,
                     type: 'LEARNING_UPDATE',
-                    timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
+                    timestamp: now.toISOString(),
                     payload: source as LearningUpdate,
                 };
                 setServerEvents(prev => [...prev, learningEvent]);
@@ -308,7 +309,8 @@ const App: React.FC = () => {
                      const proactiveAlert: ServerEvent = {
                         id: `se-${now.getTime()}-proactive`,
                         type: 'PROACTIVE_ALERT_PUSH',
-                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
+                        timestamp: new Date().toISOString(),
                         payload: {
                             title: `Heightened Threat Activity Detected`,
                             threat_summary: `Correlated multiple threats targeting the ${industry} industry in ${region}. Threats include: ${Array.from(data.titles).join(', ')}.`,
@@ -336,7 +338,7 @@ const App: React.FC = () => {
                 window.clearInterval(intervalRef.current);
             }
         };
-    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync, logKnowledgeContribution]);
+    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync]);
 
 
     const handleSend = async (prompt: string) => {
@@ -384,7 +386,8 @@ const App: React.FC = () => {
         const pushEvent: ServerEvent = {
             id: `se-${Date.now()}-directive-upgrade`,
             type: 'DIRECTIVE_PUSH',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
+            timestamp: new Date().toISOString(),
             payload: { directive } as DirectivePush
         };
         setServerEvents(prev => [...prev, pushEvent]);
@@ -404,6 +407,38 @@ const App: React.FC = () => {
             return newCases;
         });
     };
+    
+    const handleAssignCase = (caseId: string, assignee: string) => {
+        setCases(prevCases => {
+            const newCases = new Map(prevCases);
+            const existingCase = newCases.get(caseId);
+            if (existingCase) {
+                newCases.set(caseId, { 
+                    ...existingCase, 
+                    assignee, 
+                    status: CaseStatus.IN_PROGRESS 
+                });
+            }
+            return newCases;
+        });
+        setAssignModalInfo({ isOpen: false, caseId: null });
+    };
+
+    const handleResolveCase = (caseId: string, notes: string) => {
+         setCases(prevCases => {
+            const newCases = new Map(prevCases);
+            const existingCase = newCases.get(caseId);
+            if (existingCase) {
+                newCases.set(caseId, { 
+                    ...existingCase, 
+                    resolution_notes: notes,
+                    status: CaseStatus.RESOLVED
+                });
+            }
+            return newCases;
+        });
+        setResolveModalInfo({ isOpen: false, caseId: null });
+    };
 
     const renderMainView = () => {
         switch(activeView) {
@@ -421,7 +456,15 @@ const App: React.FC = () => {
                     />
                 );
             case 'Agent Fleet':
-                return <AgentFleetView alerts={alerts} serverEvents={serverEvents} onUpgradeClick={() => setUpgradeModalOpen(true)} onCreateCase={handleCreateCase} />;
+                return <AgentFleetView 
+                            alerts={alerts} 
+                            serverEvents={serverEvents} 
+                            cases={cases}
+                            onUpgradeClick={() => setUpgradeModalOpen(true)} 
+                            onCreateCase={handleCreateCase}
+                            onAssignCaseClick={(caseId) => setAssignModalInfo({ isOpen: true, caseId })}
+                            onResolveCaseClick={(caseId) => setResolveModalInfo({ isOpen: true, caseId })}
+                        />;
             case 'Server Intelligence':
                  return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} />;
             default:
@@ -458,6 +501,18 @@ const App: React.FC = () => {
                 isOpen={isUpgradeModalOpen} 
                 onClose={() => setUpgradeModalOpen(false)} 
                 onInitiateUpgrade={handleInitiateUpgrade} 
+            />
+            <AssignCaseModal
+                isOpen={assignModalInfo.isOpen}
+                onClose={() => setAssignModalInfo({ isOpen: false, caseId: null })}
+                caseId={assignModalInfo.caseId}
+                onAssign={handleAssignCase}
+            />
+            <ResolveCaseModal
+                isOpen={resolveModalInfo.isOpen}
+                onClose={() => setResolveModalInfo({ isOpen: false, caseId: null })}
+                caseId={resolveModalInfo.caseId}
+                onResolve={handleResolveCase}
             />
         </div>
     );
