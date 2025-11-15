@@ -1,4 +1,4 @@
-# Cyber Architect AI
+# OpenProtectAI
 
 A dynamic, enterprise-ready admin console that simulates an AI-powered, self-learning cybersecurity platform, complete with an expert AI assistant for real-time architectural design and guidance.
 
