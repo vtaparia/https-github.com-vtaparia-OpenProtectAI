@@ -20,9 +20,12 @@ export interface Device {
     type: 'Desktop' | 'Server' | 'Mobile' | 'Laptop' | 'IoT Device' | 'Firewall' | 'Cloud VM' | 'Container';
     os: 'Windows' | 'Linux' | 'Android' | 'macOS' | 'Embedded Linux' | 'PAN-OS' | 'Ubuntu';
     hostname: string;
+    ip_address: string;
+    last_seen: string;
+    agent_version: string;
     firewall_status: 'Enabled' | 'Disabled';
     disk_encryption: 'Enabled' | 'Disabled';
-    status: 'Online' | 'Offline';
+    status: 'Online' | 'Offline' | 'Alerting';
 }
 
 export interface AlertContext {

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import ResponseDisplay from './ResponseDisplay';
 import PromptInput from './PromptInput';
@@ -20,10 +21,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ chatHistory, isLoading, onSend })
                 className="w-full py-1 bg-slate-700/50 hover:bg-slate-700 text-gray-400 flex items-center justify-center"
                 title={isExpanded ? "Collapse Chat" : "Expand Chat"}
             >
-                <span className="text-xs font-semibold">AI Architect Assistant</span>
-                <div className={`${isExpanded ? '' : 'rotate-180'}`}>
-                    <ChevronIcon isExpanded={!isExpanded} />
-                </div>
+                <span className="text-xs font-semibold mr-2">AI Architect Assistant</span>
+                <ChevronIcon isExpanded={isExpanded} />
             </button>
             <div className={`flex-1 flex flex-col overflow-hidden ${isExpanded ? 'visible' : 'hidden'}`}>
                 <ResponseDisplay chatHistory={chatHistory} isLoading={isLoading} />

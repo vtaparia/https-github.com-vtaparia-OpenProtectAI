@@ -107,7 +107,7 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
     }
 
     return (
-        <div className="p-4 flex flex-col h-full">
+        <div className="p-4 flex flex-col h-full bg-slate-800/50 backdrop-blur-lg border border-slate-700/50 rounded-lg">
             <div className="flex-shrink-0 mb-4">
                 <button
                     onClick={onReturn}
@@ -116,7 +116,7 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Return to Dashboard
+                    Return to Previous View
                 </button>
             </div>
             <div className="flex-1 overflow-y-auto pr-2">

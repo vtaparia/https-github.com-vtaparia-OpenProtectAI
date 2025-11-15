@@ -1,18 +1,18 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChatMessage, MessageRole, Alert, AlertSeverity, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, AlertContext, KnowledgeContribution, AutomatedRemediation } from './types';
+import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity } from './types';
 import { getChatResponse } from './services/geminiService';
 import Header from './components/Header';
-import AlertFeed from './components/AlertFeed';
-import ServerBrainFeed from './components/ServerBrainFeed';
 import { sha256 } from './utils/hashing';
-import DeploymentModal from './components/DeploymentModal';
 import DashboardView from './components/DashboardView';
 import DetailView from './components/DetailView';
 import SettingsModal from './components/SettingsModal';
 import LearningAnalyticsModal from './components/LearningAnalyticsModal';
 import ChatPanel from './components/ChatPanel';
-// FIX: Import NavigationSidebar component and its View type to resolve component and type errors.
 import NavigationSidebar, { View as NavigationView } from './components/NavigationSidebar';
+import AgentFleetView from './components/AgentFleetView';
+import ServerIntelligenceView from './components/ServerIntelligenceView';
+import DeploymentModal from './components/DeploymentModal';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -24,8 +24,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'svchost.exe', 
             file_count: 1024, 
             pattern: 'mass_encryption.fast',
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Desktop', os: 'Windows', hostname: 'FINANCE-PC-01', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Desktop', os: 'Windows', hostname: 'FINANCE-PC-01', ip_address: '10.1.5.112', last_seen: '2m ago', agent_version: '3.1.2', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
             context: { industry: 'Financial', country: 'USA', continent: 'North America', region: 'NA-East' }
         }
     },
@@ -36,8 +35,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
         raw_data: { 
             process: 'mimikatz.exe', 
             target_process: 'lsass.exe',
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Server', os: 'Windows', hostname: 'DC-01', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Server', os: 'Windows', hostname: 'DC-01', ip_address: '192.168.1.10', last_seen: '10m ago', agent_version: '3.1.1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Government', country: 'Germany', continent: 'Europe', region: 'EU-Central' }
         }
     },
@@ -49,8 +47,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'powershell.exe', 
             destination_ip: '104.21.5.19',
             port: 4444,
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Desktop', os: 'Windows', hostname: 'HR-PC-22', firewall_status: 'Disabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Desktop', os: 'Windows', hostname: 'HR-PC-22', ip_address: '10.1.6.45', last_seen: '1h ago', agent_version: '3.1.2', firewall_status: 'Disabled', disk_encryption: 'Enabled', status: 'Alerting' },
             context: { industry: 'Healthcare', country: 'UK', continent: 'Europe', region: 'EU-West' }
         }
     },
@@ -62,8 +59,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'rundll32.exe',
             memory_address: '0x00007FFD7A4E0000-0x00007FFD7A4F0000',
             signature: 'CobaltStrike.Beacon.Generic',
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Server', os: 'Linux', hostname: 'WEB-SRV-03', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Server', os: 'Linux', hostname: 'WEB-SRV-03', ip_address: '172.16.30.8', last_seen: '5m ago', agent_version: '3.2.0', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
             context: { industry: 'Manufacturing', country: 'Japan', continent: 'Asia', region: 'APAC' }
         }
     },
@@ -75,8 +71,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             application: 'Salesforce',
             username: 'amanda.b',
             password_strength: 'weak',
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Laptop', os: 'macOS', hostname: 'MKTG-MAC-05', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Laptop', os: 'macOS', hostname: 'MKTG-MAC-05', ip_address: '192.168.10.51', last_seen: 'Just now', agent_version: '3.1.5', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Retail', country: 'USA', continent: 'North America', region: 'NA-West' }
         }
     },
@@ -88,8 +83,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'sqlplus.exe',
             user: 'prod_db_user',
             query: 'SELECT * FROM customers;',
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Server', os: 'Linux', hostname: 'APP-SRV-01', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Server', os: 'Linux', hostname: 'APP-SRV-01', ip_address: '172.16.30.15', last_seen: '30s ago', agent_version: '3.2.0', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Financial', country: 'Brazil', continent: 'South America', region: 'SA-East' }
         }
     },
@@ -100,8 +94,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
         raw_data: {
             url: 'http://totally-safe-bank.com/login',
             application: 'Chrome',
-            // FIX: Added missing 'status' property to conform to the Device type.
-            device: { type: 'Mobile', os: 'Android', hostname: 'samsung-sm-g998u1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Mobile', os: 'Android', hostname: 'samsung-sm-g998u1', ip_address: '100.80.15.2', last_seen: '1m ago', agent_version: '2.5.1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Retail', country: 'Australia', continent: 'Australia', region: 'APAC' }
         }
     },
@@ -152,7 +145,7 @@ const App: React.FC = () => {
     const intervalRef = useRef<number | undefined>();
     let alertCounter = 0;
     
-    const logKnowledgeContribution = (source: string, points: number) => {
+    const logKnowledgeContribution = useCallback((source: string, points: number) => {
         setKnowledgeLevel(currentLevel => {
             const newTotal = Math.min(100, currentLevel + points);
             const newEntry: KnowledgeContribution = {
@@ -165,7 +158,7 @@ const App: React.FC = () => {
             setLearningLog(prevLog => [newEntry, ...prevLog].slice(0, 100)); // Keep last 100 entries
             return newTotal;
         });
-    };
+    }, []);
 
     const processAlert = useCallback(async (alert: Alert) => {
         const sanitized_data: Record<string, any> = {};
@@ -248,7 +241,8 @@ const App: React.FC = () => {
 
         setCorrelationActivity(prev => [...prev.slice(1), activitySpike]);
 
-    }, []);
+    // FIX: Added `logKnowledgeContribution` to the dependency array of useCallback, as it's used within the function. This follows React's hook rules and prevents potential stale closures.
+    }, [logKnowledgeContribution]);
 
     const pushKnowledgeSync = useCallback(() => {
         const syncEvent: ServerEvent = {
@@ -359,29 +353,56 @@ const App: React.FC = () => {
     
     const [activeView, setActiveView] = useState<NavigationView>('Dashboard');
 
+    const handleViewChange = (view: NavigationView) => {
+        setActiveView(view);
+        setSelectedDetailItem(null); // Clear detail view when changing main view
+    }
+
+    const handleSelectItem = (item: AllEventTypes) => {
+        // For server events, we want a full-screen detail view
+        if ('type' in item) {
+             setActiveView('Server Intelligence'); // Switch view for context
+             setSelectedDetailItem(item);
+        }
+    }
+
+    const renderMainView = () => {
+        switch(activeView) {
+            case 'Dashboard':
+                 return (
+                    <DashboardView 
+                        serverKnowledgeLevel={knowledgeLevel}
+                        agentKnowledgeLevel={agentKnowledgeLevel}
+                        serverEvents={serverEvents}
+                        correlationActivity={correlationActivity}
+                        onDeployClick={() => setDeploymentModalOpen(true)}
+                        onSettingsClick={() => setSettingsModalOpen(true)}
+                        onKnowledgeMeterClick={() => setAnalyticsModalOpen(true)}
+                    />
+                );
+            case 'Agent Fleet':
+                return <AgentFleetView alerts={alerts} />;
+            case 'Server Intelligence':
+                 return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} />;
+            default:
+                return null;
+        }
+    }
+
     return (
         <div className="h-screen w-screen flex flex-col bg-slate-900 text-gray-200 font-sans">
             <Header />
             <main className="flex-1 flex overflow-hidden">
                 <NavigationSidebar 
                     activeView={activeView} 
-                    onViewChange={setActiveView} 
+                    onViewChange={handleViewChange} 
                 />
                 <div className="flex-1 flex flex-col overflow-y-auto p-4 gap-4">
-                     {activeView === 'Dashboard' && (
-                         <DashboardView 
-                            serverKnowledgeLevel={knowledgeLevel}
-                            agentKnowledgeLevel={agentKnowledgeLevel}
-                            serverEvents={serverEvents}
-                            correlationActivity={correlationActivity}
-                            onDeployClick={() => setDeploymentModalOpen(true)}
-                            onSettingsClick={() => setSettingsModalOpen(true)}
-                            onKnowledgeMeterClick={() => setAnalyticsModalOpen(true)}
-                        />
+                     {selectedDetailItem && activeView === 'Server Intelligence' ? (
+                        <DetailView item={selectedDetailItem} onReturn={() => setSelectedDetailItem(null)} />
+                     ) : (
+                        renderMainView()
                      )}
-                     {/* FIX: Updated view names to match the NavigationSidebar component's View type. */}
-                     {activeView === 'Agent Fleet' && <AlertFeed alerts={alerts} onSelectItem={() => {}} />}
-                     {activeView === 'Server Intelligence' && <ServerBrainFeed events={serverEvents} onSelectItem={() => {}} />}
                 </div>
             </main>
              <ChatPanel 
