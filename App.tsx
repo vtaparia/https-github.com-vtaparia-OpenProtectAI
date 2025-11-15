@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
 import { getChatResponse } from './services/geminiService';
@@ -19,6 +17,7 @@ import ReleaseNotesModal from './components/ReleaseNotesModal';
 import AgentUpgradeModal from './components/AgentUpgradeModal';
 import AssignCaseModal from './components/AssignCaseModal';
 import ResolveCaseModal from './components/ResolveCaseModal';
+import IncidentReviewView from './components/IncidentReviewView';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -161,7 +160,6 @@ const App: React.FC = () => {
             const newTotal = Math.min(100, currentLevel + points);
             const newEntry: KnowledgeContribution = {
                 id: `log-${Date.now()}-${Math.random()}`,
-// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
                 timestamp: new Date().toISOString(),
                 source,
                 points,
@@ -170,7 +168,7 @@ const App: React.FC = () => {
             setLearningLog(prevLog => [newEntry, ...prevLog].slice(0, 100)); // Keep last 100 entries
             return newTotal;
         });
-    }, []);
+    }, [setKnowledgeLevel, setLearningLog]);
 
     const processAlert = useCallback(async (alert: Alert) => {
         const sanitized_data: Record<string, any> = {};
@@ -259,7 +257,6 @@ const App: React.FC = () => {
         const syncEvent: ServerEvent = {
             id: `se-${Date.now()}-sync`,
             type: 'KNOWLEDGE_SYNC',
-// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
             timestamp: new Date().toISOString(),
             payload: {
                 description: 'Pushed latest threat intelligence models and IOCs to fleet.',
@@ -281,7 +278,6 @@ const App: React.FC = () => {
                 const newAlert: Alert = {
                     ...sample,
                     id: `alert-${now.getTime()}`,
-// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
                     timestamp: now.toISOString(),
                 };
                 setAlerts(prev => [newAlert, ...prev].slice(0, 50));
@@ -293,7 +289,6 @@ const App: React.FC = () => {
                 const learningEvent: ServerEvent = {
                     id: `se-${now.getTime()}`,
                     type: 'LEARNING_UPDATE',
-// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
                     timestamp: now.toISOString(),
                     payload: source as LearningUpdate,
                 };
@@ -309,7 +304,6 @@ const App: React.FC = () => {
                      const proactiveAlert: ServerEvent = {
                         id: `se-${now.getTime()}-proactive`,
                         type: 'PROACTIVE_ALERT_PUSH',
-// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
                         timestamp: new Date().toISOString(),
                         payload: {
                             title: `Heightened Threat Activity Detected`,
@@ -338,7 +332,7 @@ const App: React.FC = () => {
                 window.clearInterval(intervalRef.current);
             }
         };
-    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync]);
+    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync, logKnowledgeContribution]);
 
 
     const handleSend = async (prompt: string) => {
@@ -386,7 +380,6 @@ const App: React.FC = () => {
         const pushEvent: ServerEvent = {
             id: `se-${Date.now()}-directive-upgrade`,
             type: 'DIRECTIVE_PUSH',
-// FIX: Using toISOString for reliable, standardized timestamps. Display formatting will be handled by consumer components.
             timestamp: new Date().toISOString(),
             payload: { directive } as DirectivePush
         };
@@ -432,7 +425,8 @@ const App: React.FC = () => {
                 newCases.set(caseId, { 
                     ...existingCase, 
                     resolution_notes: notes,
-                    status: CaseStatus.RESOLVED
+                    status: CaseStatus.RESOLVED,
+                    resolved_at: new Date().toISOString(),
                 });
             }
             return newCases;
@@ -467,6 +461,8 @@ const App: React.FC = () => {
                         />;
             case 'Server Intelligence':
                  return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} />;
+            case 'Incident Review':
+                 return <IncidentReviewView cases={cases} />;
             default:
                 return null;
         }

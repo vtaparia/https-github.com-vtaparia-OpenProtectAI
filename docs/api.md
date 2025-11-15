@@ -125,6 +125,37 @@ paths:
         '401':
           description: "Unauthorized. The user does not have permission to assign cases."
 
+  /v1/cases/resolved:
+    get:
+      tags:
+        - Case Management
+      summary: "Retrieve resolved cases"
+      description: "Fetches a list of resolved cases for auditing and review, with support for pagination."
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of cases to return.
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          description: Number of cases to skip for pagination.
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: "A paginated list of resolved cases."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Case'
+        '401':
+          description: "Unauthorized."
+
 components:
   schemas:
     AlertSeverity:
@@ -151,6 +182,11 @@ components:
           items:
             type: string
             description: "Alert IDs related to this case."
+        resolution_notes:
+          type: string
+        resolved_at:
+          type: string
+          format: date-time
 
     AlertContext:
       type: object

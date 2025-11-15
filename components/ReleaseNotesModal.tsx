@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 
 interface ReleaseNotesModalProps {
@@ -29,39 +28,36 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.5.0</h2>
+          <h2 className="text-xl font-bold">What's New in v1.6.0</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">SOC Workflow &amp; Case Assignment</h3>
+            <h3 className="text-lg font-bold text-gray-100">Incident Review & Auditing</h3>
             
-            <Feature title="New: Case Assignment Workflow">
-                To enhance the incident response lifecycle, cases can now be assigned to specific security analysts. Assigned cases automatically transition to an "In Progress" state, and the assignee is clearly displayed on the alert, creating a complete audit and accountability trail.
+            <Feature title="New: Incident Review View">
+                A new "Incident Review" section has been added to the main navigation. This dedicated workspace allows SOC managers and analysts to view, search, and audit all resolved cases, providing a complete historical record of past incidents.
             </Feature>
-             <Feature title="New: Assign Case Modal">
-                An intuitive modal allows for the quick assignment of any new case to a predefined list of analysts, streamlining the SOC manager's workflow.
+             <Feature title="New: Audit Trail">
+                Each resolved case in the new view provides a complete audit trail, including the original threat details, the assigned analyst, the resolution notes, and relevant timestamps, which is critical for compliance and post-mortem analysis.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
             
-            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.4.0 - Incident Response &amp; Case Management</h4>
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.5.0 - SOC Workflow &amp; Case Assignment</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="Case Management System">
-                    Analysts can create an investigation "Case" from any high or critical severity alert, assigning a unique Case ID for tracking.
-                </Feature>
-                <Feature title="Open Cases Dashboard">
-                   The main dashboard includes a summary of open cases by status for an at-a-glance overview of the SOC's workload.
+                <Feature title="Case Assignment Workflow">
+                    To enhance the incident response lifecycle, cases can now be assigned to specific security analysts, automatically transitioning them to an "In Progress" state.
                 </Feature>
             </div>
 
 
-            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.3.0 - Agent Action &amp; Remediation Visibility</h4>
+            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.4.0 - Incident Response &amp; Case Management</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="Agent Remediation History">
-                    The Agent Fleet detail view now includes a 'Remediation History' section, showing all automated remediation actions taken on the selected agent.
+                <Feature title="Case Management System">
+                    Analysts can create an investigation "Case" from any high or critical severity alert, assigning a unique Case ID for tracking.
                 </Feature>
             </div>
         </main>

@@ -28,6 +28,7 @@ export interface Case {
     alerts: Alert[];
     assignee?: string;
     resolution_notes?: string;
+    resolved_at?: string;
 }
 
 export interface Device {
