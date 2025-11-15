@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 interface ReleaseNotesModalProps {
@@ -28,25 +29,30 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.6.0</h2>
+          <h2 className="text-xl font-bold">What's New in v1.6.1</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">Incident Review & Auditing</h3>
+            <h3 className="text-lg font-bold text-gray-100">Intelligence Enhancements</h3>
             
-            <Feature title="New: Incident Review View">
-                A new "Incident Review" section has been added to the main navigation. This dedicated workspace allows SOC managers and analysts to view, search, and audit all resolved cases, providing a complete historical record of past incidents.
-            </Feature>
-             <Feature title="New: Audit Trail">
-                Each resolved case in the new view provides a complete audit trail, including the original threat details, the assigned analyst, the resolution notes, and relevant timestamps, which is critical for compliance and post-mortem analysis.
+            <Feature title="New Intel Source: Grok AI Analysis">
+                The server can now simulate leveraging a powerful Large Language Model (like Grok) to analyze complex, uncategorized threat data and generate actionable summaries. This represents a cutting-edge capability for identifying novel threats.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
             
-            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.5.0 - SOC Workflow &amp; Case Assignment</h4>
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.6.0 - Incident Review & Auditing</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                <Feature title="Incident Review View">
+                    A new "Incident Review" section allows SOC managers to view, search, and audit all resolved cases, providing a complete historical record of past incidents.
+                </Feature>
+            </div>
+
+
+            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.5.0 - SOC Workflow &amp; Case Assignment</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
                 <Feature title="Case Assignment Workflow">
                     To enhance the incident response lifecycle, cases can now be assigned to specific security analysts, automatically transitioning them to an "In Progress" state.

@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI, Chat } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `
@@ -54,6 +55,86 @@ IMPORTANT RULES:
 • Use Markdown for formatting and Mermaid for diagrams.
 `;
 
+/**
+ * =================================================================================
+ * Option 1: Integration with a self-hosted Open-Source LLM via Ollama
+ * =================================================================================
+ * This implementation uses the standard `fetch` API to communicate with a local
+ * Ollama server. It's a great way to use models like Gemma, Llama, etc., for free.
+ * 
+ * To use this:
+ * 1. Install Ollama: https://ollama.com/
+ * 2. Run a model in your terminal: `ollama run gemma:2b`
+ * 3. The application will now work with your local LLM.
+ */
+/*
+export async function* getChatResponse(prompt: string): AsyncGenerator<{ text: () => string; }> {
+    if (typeof prompt !== 'string' || !prompt.trim()) {
+        throw new Error('Invalid prompt provided.');
+    }
+
+    try {
+        const response = await fetch('http://localhost:11434/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: 'gemma:2b', // Or whatever model you are running
+                messages: [
+                    { role: 'system', content: SYSTEM_INSTRUCTION },
+                    { role: 'user', content: prompt }
+                ],
+                stream: true,
+            }),
+        });
+
+        if (!response.body) {
+            throw new Error('Response body is null.');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            const chunk = decoder.decode(value);
+            // Ollama streams NDJSON, so we parse each line
+            const lines = chunk.split('\n').filter(line => line.trim() !== '');
+            for (const line of lines) {
+                const parsed = JSON.parse(line);
+                if (parsed.message && parsed.message.content) {
+                    // Yield an object that matches the expected Gemini chunk format
+                    yield { text: () => parsed.message.content };
+                }
+                 if (parsed.error) {
+                    throw new Error(`Ollama API Error: ${parsed.error}`);
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error("Ollama API Error:", error);
+        throw new Error("Failed to get response from local LLM. Is Ollama running with a model (e.g., `ollama run gemma:2b`)?");
+    }
+}
+*/
+
+
+/**
+ * =================================================================================
+ * Option 2: Original Gemini API integration
+ * =================================================================================
+ * This is the original code that communicates with the Google Gemini API.
+ * To use this, rename this function to `getChatResponse` and the function above
+ * to something else (e.g., `getChatResponseOllama`).
+ * 
+ * You will also need to have the `API_KEY` environment variable set.
+ */
+// FIX: Switched from Ollama to Gemini API by activating this implementation.
 let chat: Chat | null = null;
 
 function getChatInstance(): Chat {
@@ -73,7 +154,6 @@ function getChatInstance(): Chat {
 }
 
 export async function getChatResponse(prompt: string) {
-  // FIX: Add validation to ensure prompt is a non-empty string.
   if (typeof prompt !== 'string' || !prompt.trim()) {
     throw new Error('Invalid prompt provided to getChatResponse.');
   }

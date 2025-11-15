@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ServerEvent, LearningUpdate, LearningSource, AllEventTypes } from '../types';
 import { IntelIcon } from './icons/IntelIcon';
@@ -18,6 +19,7 @@ const sourceStyles: Record<LearningSource, { bg: string; border: string; text: s
     'OSV': { bg: 'bg-teal-500/10', border: 'border-teal-500/30', text: 'text-teal-300', hoverBg: 'hover:bg-teal-500/20' },
     'Exploit-DB': { bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', text: 'text-fuchsia-300', hoverBg: 'hover:bg-fuchsia-500/20' },
     'Antivirus Detections': { bg: 'bg-pink-500/10', border: 'border-pink-500/30', text: 'text-pink-300', hoverBg: 'hover:bg-pink-500/20' },
+    'Grok AI Analysis': { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-300', hoverBg: 'hover:bg-indigo-500/20' },
 };
 
 const LearningUpdateItem: React.FC<LearningUpdateItemProps> = ({ event, onSelectItem }) => {

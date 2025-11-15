@@ -37,7 +37,7 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 
 ### 5. Simulated Self-Learning Engine
 - **Bidirectional Communication:** The UI visualizes the complete security loop: agents send telemetry, the server learns, and the server pushes actionable intelligence back to the agents.
-- **Multi-Source Intelligence Fusion:** The simulation demonstrates the server learning from a wide array of external sources, including **MITRE ATT&CK, NVD, EPSS, Exploit-DB, VirusTotal,** and other security vendors.
+- **Multi-Source Intelligence Fusion:** The simulation demonstrates the server learning from a wide array of external sources, including **MITRE ATT&CK, NVD, EPSS, Exploit-DB, VirusTotal, Grok AI Analysis,** and other security vendors.
 - **Context-Aware AI:** The server learns from the geographical and industry context of threats to issue targeted, proactive alerts to agents in high-risk trajectories.
 - **Automated Security Actions:** The simulation visualizes the server taking automated actions for the most critical threats, such as triggering a host remediation.
 

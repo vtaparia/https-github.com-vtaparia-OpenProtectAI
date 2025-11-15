@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
 import { getChatResponse } from './services/geminiService';
@@ -113,6 +114,7 @@ const externalIntelSources: Omit<LearningUpdate, 'details'>[] = [
     { source: 'Microsoft Defender', summary: 'New behavioral analytics model for detecting lateral movement.'},
     { source: 'Splunk SIEM', summary: 'Correlated low-and-slow C2 traffic across multiple tenants.'},
     { source: 'Antivirus Detections', summary: 'Increased global detections of SmokeLoader backdoor.'},
+    { source: 'Grok AI Analysis', summary: 'Analyzed anomalous C2 traffic pattern; identified potential linkage to new APT campaign.' },
 ];
 
 const vulnerabilityIntelSources: LearningUpdate[] = [
@@ -346,7 +348,7 @@ const App: React.FC = () => {
             setChatHistory(prev => [...prev, { role: MessageRole.MODEL, content: '' }]);
 
             for await (const chunk of stream) {
-                // FIX: In streaming mode, the `text` field on a `GenerateContentResponse` chunk is a function. Call `chunk.text()` to get the string content.
+                // FIX: Per Gemini API guidelines, the `text` property on a streaming `GenerateContentResponse` chunk is a function.
                 modelResponse += chunk.text();
                 setChatHistory(prev => {
                     const newHistory = [...prev];
