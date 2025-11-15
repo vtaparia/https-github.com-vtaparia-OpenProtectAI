@@ -86,7 +86,7 @@ const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, c
             event.type === 'AUTOMATED_REMEDIATION' && 
             (event.payload as AutomatedRemediation).target_host === selectedAgent.hostname
         )
-        // FIX: Sort by parsing the ISO timestamp string to ensure correct chronological order.
+        // Sort by parsing the ISO timestamp string to ensure correct chronological order.
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [selectedAgent, serverEvents]);
 

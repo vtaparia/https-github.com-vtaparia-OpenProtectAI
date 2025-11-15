@@ -39,8 +39,8 @@ const LearningUpdateItem: React.FC<LearningUpdateItemProps> = ({ event, onSelect
           <p className={`text-sm font-semibold ${style.text}`}>Intel Update: {payload.source}</p>
           <p className="text-xs text-gray-300 mt-1">{payload.summary}</p>
           <div className="flex items-center justify-end mt-2">
-            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
-            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
+            {/* Provided a locale to toLocaleTimeString for consistent time formatting. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString('en-US')}</span>
           </div>
         </div>
       </div>

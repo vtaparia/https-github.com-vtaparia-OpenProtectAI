@@ -32,8 +32,8 @@ const LWServerEventItem: React.FC<LWServerEventItemProps> = ({ event, onSelectIt
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
               {payload.severity}
             </span>
-            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
-            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
+            {/* Provided a locale to toLocaleTimeString for consistent time formatting. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString('en-US')}</span>
           </div>
         </div>
       </div>

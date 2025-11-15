@@ -38,8 +38,8 @@ const DirectivePushItem: React.FC<DirectivePushItemProps> = ({ event, onSelectIt
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">
               {details}
             </span>
-            {/* FIX: Format the ISO timestamp string into a readable time for display. */}
-            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString()}</span>
+            {/* Provided a locale to toLocaleTimeString for consistent time formatting. */}
+            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString('en-US')}</span>
           </div>
         </div>
       </div>

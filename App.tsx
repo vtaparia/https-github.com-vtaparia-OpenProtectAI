@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
 import { getChatResponse } from './services/geminiService';
@@ -348,8 +346,8 @@ const App: React.FC = () => {
             setChatHistory(prev => [...prev, { role: MessageRole.MODEL, content: '' }]);
 
             for await (const chunk of stream) {
-                // FIX: Per Gemini API guidelines, the `text` property on a streaming `GenerateContentResponse` chunk is a function.
-                modelResponse += chunk.text();
+                // Per Gemini API guidelines, the `text` property on a streaming `GenerateContentResponse` chunk is a string property.
+                modelResponse += chunk.text;
                 setChatHistory(prev => {
                     const newHistory = [...prev];
                     newHistory[newHistory.length - 1].content = modelResponse;
