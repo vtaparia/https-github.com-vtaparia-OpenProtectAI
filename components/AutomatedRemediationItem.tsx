@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ServerEvent, AutomatedRemediation, AllEventTypes } from '../types';
 import { RemediationIcon } from './icons/RemediationIcon';

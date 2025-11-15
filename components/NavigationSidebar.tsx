@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { DashboardIcon, AgentIcon, ServerIcon } from './icons/NavIcons';
 
-type View = 'Dashboard' | 'Agents' | 'Server';
+export type View = 'Dashboard' | 'Agent Fleet' | 'Server Intelligence';
 
 interface NavigationSidebarProps {
   activeView: View;
@@ -28,7 +27,7 @@ const NavItem: React.FC<{
 
 const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onViewChange }) => {
   return (
-    <nav className="w-24 bg-slate-900/75 p-3 space-y-3 border-r border-slate-700/50">
+    <nav className="w-28 bg-slate-900/75 p-3 space-y-3 border-r border-slate-700/50 shrink-0">
         <NavItem 
             icon={<DashboardIcon />}
             label="Dashboard"
@@ -37,15 +36,15 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
         />
         <NavItem 
             icon={<AgentIcon />}
-            label="Agents"
-            isActive={activeView === 'Agents'}
-            onClick={() => onViewChange('Agents')}
+            label="Agent Fleet"
+            isActive={activeView === 'Agent Fleet'}
+            onClick={() => onViewChange('Agent Fleet')}
         />
         <NavItem 
             icon={<ServerIcon />}
-            label="Server"
-            isActive={activeView === 'Server'}
-            onClick={() => onViewChange('Server')}
+            label="Server Intelligence"
+            isActive={activeView === 'Server Intelligence'}
+            onClick={() => onViewChange('Server Intelligence')}
         />
     </nav>
   );

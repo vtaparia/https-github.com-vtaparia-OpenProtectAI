@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ResponseDisplay from './ResponseDisplay';
 import PromptInput from './PromptInput';

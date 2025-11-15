@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, MessageRole, Alert, AlertSeverity, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, AlertContext, KnowledgeContribution, AutomatedRemediation } from './types';
 import { getChatResponse } from './services/geminiService';
@@ -12,7 +11,8 @@ import DetailView from './components/DetailView';
 import SettingsModal from './components/SettingsModal';
 import LearningAnalyticsModal from './components/LearningAnalyticsModal';
 import ChatPanel from './components/ChatPanel';
-import NavigationSidebar from './components/NavigationSidebar';
+// FIX: Import NavigationSidebar component and its View type to resolve component and type errors.
+import NavigationSidebar, { View as NavigationView } from './components/NavigationSidebar';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -24,7 +24,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'svchost.exe', 
             file_count: 1024, 
             pattern: 'mass_encryption.fast',
-            device: { type: 'Desktop', os: 'Windows', hostname: 'FINANCE-PC-01', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Desktop', os: 'Windows', hostname: 'FINANCE-PC-01', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Financial', country: 'USA', continent: 'North America', region: 'NA-East' }
         }
     },
@@ -35,7 +36,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
         raw_data: { 
             process: 'mimikatz.exe', 
             target_process: 'lsass.exe',
-            device: { type: 'Server', os: 'Windows', hostname: 'DC-01', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Server', os: 'Windows', hostname: 'DC-01', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Government', country: 'Germany', continent: 'Europe', region: 'EU-Central' }
         }
     },
@@ -47,7 +49,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'powershell.exe', 
             destination_ip: '104.21.5.19',
             port: 4444,
-            device: { type: 'Desktop', os: 'Windows', hostname: 'HR-PC-22', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Desktop', os: 'Windows', hostname: 'HR-PC-22', firewall_status: 'Disabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Healthcare', country: 'UK', continent: 'Europe', region: 'EU-West' }
         }
     },
@@ -59,7 +62,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'rundll32.exe',
             memory_address: '0x00007FFD7A4E0000-0x00007FFD7A4F0000',
             signature: 'CobaltStrike.Beacon.Generic',
-            device: { type: 'Server', os: 'Linux', hostname: 'WEB-SRV-03', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Server', os: 'Linux', hostname: 'WEB-SRV-03', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Manufacturing', country: 'Japan', continent: 'Asia', region: 'APAC' }
         }
     },
@@ -71,7 +75,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             application: 'Salesforce',
             username: 'amanda.b',
             password_strength: 'weak',
-            device: { type: 'Laptop', os: 'macOS', hostname: 'MKTG-MAC-05', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Laptop', os: 'macOS', hostname: 'MKTG-MAC-05', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Retail', country: 'USA', continent: 'North America', region: 'NA-West' }
         }
     },
@@ -83,7 +88,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             process: 'sqlplus.exe',
             user: 'prod_db_user',
             query: 'SELECT * FROM customers;',
-            device: { type: 'Server', os: 'Linux', hostname: 'APP-SRV-01', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Server', os: 'Linux', hostname: 'APP-SRV-01', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Financial', country: 'Brazil', continent: 'South America', region: 'SA-East' }
         }
     },
@@ -94,7 +100,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
         raw_data: {
             url: 'http://totally-safe-bank.com/login',
             application: 'Chrome',
-            device: { type: 'Mobile', os: 'Android', hostname: 'samsung-sm-g998u1', firewall_status: 'Enabled', disk_encryption: 'Enabled' },
+            // FIX: Added missing 'status' property to conform to the Device type.
+            device: { type: 'Mobile', os: 'Android', hostname: 'samsung-sm-g998u1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Retail', country: 'Australia', continent: 'Australia', region: 'APAC' }
         }
     },
@@ -150,8 +157,7 @@ const App: React.FC = () => {
             const newTotal = Math.min(100, currentLevel + points);
             const newEntry: KnowledgeContribution = {
                 id: `log-${Date.now()}-${Math.random()}`,
-                // FIX: Pass an empty array to toLocaleTimeString to satisfy environments that expect an argument.
-                timestamp: new Date().toLocaleTimeString([]),
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                 source,
                 points,
                 newTotal,
@@ -193,7 +199,6 @@ const App: React.FC = () => {
         };
         setServerEvents(prev => [...prev, serverEvent]);
 
-        // Server Learning Logic
         let knowledgeGain = 0;
         let activitySpike = 0;
         if (alert.severity === AlertSeverity.CRITICAL) { 
@@ -225,7 +230,6 @@ const App: React.FC = () => {
             });
         }
         
-        // Automated Remediation for critical threats
         if (alert.severity === AlertSeverity.CRITICAL) {
              const remediationEvent: ServerEvent = {
                 id: `se-${Date.now()}-remediate`,
@@ -250,7 +254,7 @@ const App: React.FC = () => {
         const syncEvent: ServerEvent = {
             id: `se-${Date.now()}-sync`,
             type: 'KNOWLEDGE_SYNC',
-            timestamp: new Date().toLocaleTimeString([]),
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
             payload: {
                 description: 'Pushed latest threat intelligence models and IOCs to fleet.',
                 version: `v${(agentKnowledgeLevel + 0.1).toFixed(2)}`
@@ -266,42 +270,38 @@ const App: React.FC = () => {
             alertCounter++;
             const now = new Date();
 
-            // Add new agent alert
             if (alertCounter % 2 === 0 && sampleAlerts.length > 0) {
                 const sample = sampleAlerts[Math.floor(Math.random() * sampleAlerts.length)];
                 const newAlert: Alert = {
                     ...sample,
                     id: `alert-${now.getTime()}`,
-                    timestamp: now.toLocaleTimeString([]),
+                    timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                 };
                 setAlerts(prev => [newAlert, ...prev].slice(0, 50));
                 processAlert(newAlert);
             }
             
-            // Add new server learning event
             if (alertCounter % 7 === 0) {
-                // FIX: Explicitly type `source` as `LearningUpdate` to ensure the `details` property can be accessed safely.
                 const source: LearningUpdate = Math.random() > 0.3 ? externalIntelSources[Math.floor(Math.random() * externalIntelSources.length)] : vulnerabilityIntelSources[Math.floor(Math.random() * vulnerabilityIntelSources.length)];
                 const learningEvent: ServerEvent = {
                     id: `se-${now.getTime()}`,
                     type: 'LEARNING_UPDATE',
-                    timestamp: now.toLocaleTimeString([]),
+                    timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                     payload: source as LearningUpdate,
                 };
                 setServerEvents(prev => [...prev, learningEvent]);
                 const intelGain = source.details ? 1.0 : 0.5;
                 logKnowledgeContribution(`Intel: ${source.source}`, intelGain);
-                setCorrelationActivity(prev => [...prev.slice(1), 12]); // Spike for intel
+                setCorrelationActivity(prev => [...prev.slice(1), 12]);
             }
 
-            // Check for proactive alerts
             Object.entries(contextualThreatTracker).forEach(([key, data]) => {
-                if (data.count > 1) { // If more than 1 hit in the same context
+                if (data.count > 1) { 
                     const [industry, region] = key.split('|');
                      const proactiveAlert: ServerEvent = {
                         id: `se-${now.getTime()}-proactive`,
                         type: 'PROACTIVE_ALERT_PUSH',
-                        timestamp: now.toLocaleTimeString([]),
+                        timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                         payload: {
                             title: `Heightened Threat Activity Detected`,
                             threat_summary: `Correlated multiple threats targeting the ${industry} industry in ${region}. Threats include: ${Array.from(data.titles).join(', ')}.`,
@@ -312,13 +312,12 @@ const App: React.FC = () => {
                     logKnowledgeContribution(`Proactive Alert for ${industry}`, 1.2);
                     setContextualThreatTracker(prev => {
                         const newTracker = {...prev};
-                        delete newTracker[key]; // Reset after firing
+                        delete newTracker[key];
                         return newTracker;
                     });
                 }
             });
             
-             // Occasionally push knowledge syncs
             if (knowledgeLevel > agentKnowledgeLevel * 1.5 && Math.random() > 0.6) {
                 pushKnowledgeSync();
             }
@@ -358,41 +357,38 @@ const App: React.FC = () => {
         }
     };
     
+    const [activeView, setActiveView] = useState<NavigationView>('Dashboard');
+
     return (
         <div className="h-screen w-screen flex flex-col bg-slate-900 text-gray-200 font-sans">
             <Header />
             <main className="flex-1 flex overflow-hidden">
                 <NavigationSidebar 
-                    activeView={'Dashboard'} 
-                    onViewChange={() => {}} 
+                    activeView={activeView} 
+                    onViewChange={setActiveView} 
                 />
-                <div className="flex-1 flex flex-col overflow-hidden">
-                    <div className="flex-1 flex gap-4 p-4 overflow-hidden">
-                        <AlertFeed alerts={alerts} onSelectItem={setSelectedDetailItem} />
-                        <div className="flex-1 flex flex-col overflow-hidden bg-slate-800/50 backdrop-blur-lg border border-slate-700/50 rounded-lg">
-                           {selectedDetailItem ? (
-                                <DetailView item={selectedDetailItem} onReturn={() => setSelectedDetailItem(null)} />
-                           ) : (
-                                <DashboardView 
-                                    serverKnowledgeLevel={knowledgeLevel}
-                                    agentKnowledgeLevel={agentKnowledgeLevel}
-                                    serverEvents={serverEvents}
-                                    correlationActivity={correlationActivity}
-                                    onDeployClick={() => setDeploymentModalOpen(true)}
-                                    onSettingsClick={() => setSettingsModalOpen(true)}
-                                    onKnowledgeMeterClick={() => setAnalyticsModalOpen(true)}
-                                />
-                           )}
-                        </div>
-                        <ServerBrainFeed events={serverEvents} onSelectItem={setSelectedDetailItem} />
-                    </div>
-                     <ChatPanel 
-                        chatHistory={chatHistory}
-                        isLoading={isLoading}
-                        onSend={handleSend}
-                     />
+                <div className="flex-1 flex flex-col overflow-y-auto p-4 gap-4">
+                     {activeView === 'Dashboard' && (
+                         <DashboardView 
+                            serverKnowledgeLevel={knowledgeLevel}
+                            agentKnowledgeLevel={agentKnowledgeLevel}
+                            serverEvents={serverEvents}
+                            correlationActivity={correlationActivity}
+                            onDeployClick={() => setDeploymentModalOpen(true)}
+                            onSettingsClick={() => setSettingsModalOpen(true)}
+                            onKnowledgeMeterClick={() => setAnalyticsModalOpen(true)}
+                        />
+                     )}
+                     {/* FIX: Updated view names to match the NavigationSidebar component's View type. */}
+                     {activeView === 'Agent Fleet' && <AlertFeed alerts={alerts} onSelectItem={() => {}} />}
+                     {activeView === 'Server Intelligence' && <ServerBrainFeed events={serverEvents} onSelectItem={() => {}} />}
                 </div>
             </main>
+             <ChatPanel 
+                chatHistory={chatHistory}
+                isLoading={isLoading}
+                onSend={handleSend}
+             />
             <DeploymentModal isOpen={isDeploymentModalOpen} onClose={() => setDeploymentModalOpen(false)} />
             <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
             <LearningAnalyticsModal isOpen={isAnalyticsModalOpen} onClose={() => setAnalyticsModalOpen(false)} log={learningLog} />

@@ -28,7 +28,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   onKnowledgeMeterClick,
 }) => {
   return (
-    <div className="p-4 flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto bg-slate-800/50 backdrop-blur-lg border border-slate-700/50 rounded-lg p-4">
         <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-100">Intelligence Dashboard</h2>
             <div className="flex items-center gap-2">
@@ -70,10 +70,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                  <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                     <CorrelationActivityGraph activityData={correlationActivity} />
                 </div>
-            </div>
-             <div className="text-center text-gray-500 pt-8">
-                <p>Welcome to the Cyber Architect AI Console.</p>
-                <p className="text-sm">Select an event from the side feeds to view its details.</p>
             </div>
         </div>
     </div>

@@ -1,4 +1,3 @@
-
 export enum MessageRole {
   USER = 'user',
   MODEL = 'model',
@@ -23,6 +22,7 @@ export interface Device {
     hostname: string;
     firewall_status: 'Enabled' | 'Disabled';
     disk_encryption: 'Enabled' | 'Disabled';
+    status: 'Online' | 'Offline';
 }
 
 export interface AlertContext {
