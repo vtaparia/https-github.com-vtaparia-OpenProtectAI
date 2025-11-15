@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
 import { getChatResponse } from './services/geminiService';
@@ -345,7 +346,8 @@ const App: React.FC = () => {
             setChatHistory(prev => [...prev, { role: MessageRole.MODEL, content: '' }]);
 
             for await (const chunk of stream) {
-                modelResponse += chunk.text;
+                // FIX: In streaming mode, the `text` field on a `GenerateContentResponse` chunk is a function. Call `chunk.text()` to get the string content.
+                modelResponse += chunk.text();
                 setChatHistory(prev => {
                     const newHistory = [...prev];
                     newHistory[newHistory.length - 1].content = modelResponse;
