@@ -1,7 +1,4 @@
-
-
-
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 // FIX: Added AgentUpgradeDirective to imports to allow for explicit typing.

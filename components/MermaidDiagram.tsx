@@ -1,3 +1,4 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React, { useEffect, useRef } from 'react';
 // @ts-ignore

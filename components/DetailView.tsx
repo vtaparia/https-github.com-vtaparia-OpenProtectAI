@@ -1,3 +1,4 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React from 'react';
 import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation, PlaybookTriggered, MitreMapping } from '../types';

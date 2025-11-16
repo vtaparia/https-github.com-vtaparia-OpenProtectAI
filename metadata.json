@@ -1,5 +1,6 @@
 {
   "name": "OpenProtectAI",
   "description": "An AI-powered assistant for designing and orchestrating end-to-end, self-learning cybersecurity platforms. Generate detailed architecture diagrams, APIs, code examples, and implementation roadmaps with expert guidance.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "copyright": "© 2024 OpenProtectAI. All Rights Reserved."
 }

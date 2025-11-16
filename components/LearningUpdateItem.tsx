@@ -1,6 +1,4 @@
-
-
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React from 'react';
 import { ServerEvent, LearningUpdate, LearningSource, AllEventTypes } from '../types';

@@ -1,9 +1,9 @@
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React, { useState } from 'react';
 import ResponseDisplay from './ResponseDisplay';
 import PromptInput from './PromptInput';
-import { ChatMessage } from '../types';
+import { ChatMessage, COPYRIGHT_NOTICE } from '../types';
 import { ChevronIcon } from './icons/ChevronIcon';
 
 interface ChatPanelProps {
@@ -29,8 +29,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ chatHistory, isLoading, onSend, t
             </button>
             <div className={`flex-1 flex flex-col overflow-hidden ${isExpanded ? 'visible' : 'hidden'}`}>
                 <ResponseDisplay chatHistory={chatHistory} isLoading={isLoading} />
-                <div className="p-4 border-t border-slate-700/50">
+                <div className="p-4 border-t border-slate-700/50 relative">
                     <PromptInput onSend={onSend} isLoading={isLoading} />
+                    <div className="absolute bottom-1 right-4 text-xs text-gray-600">
+                        {COPYRIGHT_NOTICE}
+                    </div>
                 </div>
             </div>
         </div>

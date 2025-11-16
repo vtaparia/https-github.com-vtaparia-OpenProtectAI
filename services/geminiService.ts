@@ -1,3 +1,4 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import { GoogleGenAI, Chat } from "@google/genai";
 import type { AIProvider } from "../types";

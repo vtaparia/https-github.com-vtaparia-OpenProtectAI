@@ -1,4 +1,4 @@
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React, { useState } from 'react';
 import { RefreshIcon } from './icons/RefreshIcon';

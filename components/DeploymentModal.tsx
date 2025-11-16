@@ -1,4 +1,4 @@
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React, { useState } from 'react';
 import { WindowsIcon, LinuxIcon, AppleIcon, AndroidIcon, AWSIcon, AzureIcon } from './icons/OSIcons';

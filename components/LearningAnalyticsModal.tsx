@@ -1,3 +1,5 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
+
 import React, { useMemo } from 'react';
 import { KnowledgeContribution } from '../types';
 import { AnalyticsIcon } from './icons/AnalyticsIcon';

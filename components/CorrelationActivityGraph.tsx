@@ -1,4 +1,4 @@
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React from 'react';
 import { ActivityIcon } from './icons/ActivityIcon';

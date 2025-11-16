@@ -1,4 +1,4 @@
-
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
 import React, { useState, useMemo } from 'react';
 import { Alert, Device, ServerEvent, AutomatedRemediation, AlertSeverity, Case, CaseStatus } from '../types';

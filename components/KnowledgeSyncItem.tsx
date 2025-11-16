@@ -1,3 +1,5 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
+
 import React from 'react';
 import { ServerEvent, KnowledgeSync, AllEventTypes } from '../types';
 import { KnowledgeSyncIcon } from './icons/KnowledgeSyncIcon';

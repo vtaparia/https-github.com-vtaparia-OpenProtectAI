@@ -1,3 +1,5 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
+
 // A utility for hashing strings using the browser's native, asynchronous Web Crypto API.
 export async function sha256(str: string): Promise<string> {
     const buffer = new TextEncoder().encode(str);

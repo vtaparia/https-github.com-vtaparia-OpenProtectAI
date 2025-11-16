@@ -1,4 +1,6 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
 
+export const COPYRIGHT_NOTICE = '© 2024 OpenProtectAI. All Rights Reserved.';
 
 
 export enum MessageRole {

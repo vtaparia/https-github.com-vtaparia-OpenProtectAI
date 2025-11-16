@@ -1,3 +1,5 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
+
 import React from 'react';
 import { Alert, AlertSeverity, AllEventTypes } from '../types';
 import { InfoIcon, WarningIcon, HighIcon, CriticalIcon } from './icons/AlertIcons';

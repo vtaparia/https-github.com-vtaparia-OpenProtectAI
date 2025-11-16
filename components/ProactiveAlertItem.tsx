@@ -1,3 +1,5 @@
+// Copyright © 2024 OpenProtectAI. All Rights Reserved.
+
 import React from 'react';
 import { ServerEvent, ProactiveAlertPush, AllEventTypes } from '../types';
 import { ProactiveAlertIcon } from './icons/ProactiveAlertIcon';
