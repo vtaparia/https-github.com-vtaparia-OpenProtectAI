@@ -29,31 +29,38 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v2.0.3</h2>
+          <h2 className="text-xl font-bold">What's New in v2.0.4</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">IP Protection & Branding</h3>
+            <h3 className="text-lg font-bold text-gray-100">Hardened Communication Channels (E2E TLS)</h3>
             
-            <Feature title="New! Copyright Notice">
-                A copyright notice has been added to the application's UI and embedded in all source code files. This measure is a standard practice to clearly state the ownership of the intellectual property.
+            <Feature title="End-to-End Encryption Hardening">
+                Re-validated and hardened the mutual TLS (mTLS) implementation across all communication channels (Agent ↔ LWServer ↔ Central Server). This ensures all telemetry, directives, and intelligence updates are fully encrypted in transit.
             </Feature>
-            <Feature title="Documentation Update">
-                The project's README and API documentation have been updated to include a formal copyright and license section, reinforcing the platform's IP.
+            <Feature title="Zero Trust Policy Enforcement">
+                The platform's communication fabric now strictly enforces a Zero Trust security model, where no component is trusted by default and must present a valid client certificate to authenticate, protecting against eavesdropping and man-in-the-middle attacks.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
             
+             <h4 className="text-md font-semibold text-gray-300 mt-2">v2.0.3 - IP Protection & Branding</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                 <Feature title="Copyright Notice">
+                    A copyright notice has been added to the application's UI and embedded in all source code files to clearly state the ownership of the intellectual property.
+                </Feature>
+            </div>
+
             <h4 className="text-md font-semibold text-gray-300 mt-2">v2.0.2 - Architectural Visibility & SOAR Enhancements</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
                  <Feature title="LWServer Knowledge Meter">
                     The main dashboard now includes a "LWServer Knowledge Tier" meter, providing critical visibility into the intelligence level of your data aggregation points.
                 </Feature>
                 <Feature title="SOAR Action: Outbound Notifications">
-                    Playbooks can now be configured to send real-time notifications to external systems, including Slack, MS Teams, and Email, integrating the platform directly into existing SOC and IT workflows.
+                    Playbooks can now be configured to send real-time notifications to external systems, including Slack, MS Teams, and Email.
                 </Feature>
             </div>
 

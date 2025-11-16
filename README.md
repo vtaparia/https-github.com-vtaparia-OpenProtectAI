@@ -34,8 +34,8 @@ The platform's core is a self-learning "Central Brain" designed to continuously 
 
 -   **Continuous Learning Loop:** The entire system operates on a continuous, self-improving feedback loop. Agents send rich telemetry to the server, the server's AI brain trains itself on this data, and it then pushes improved intelligence, new detection rules, and updated models back to the entire agent fleet. This ensures the system grows smarter and more resilient over time.
 
-### 4. Zero Trust Communication Fabric (mTLS)
-All communication between agents, LWServers, and the central cloud platform is secured using a Zero Trust model. Every service-to-service connection is authenticated and encrypted using **mutual TLS (mTLS)**. This means that every component must present a valid, signed client certificate to establish a connection, preventing unauthorized access, data interception, and man-in-the-middle attacks across the entire architecture.
+### 4. Hardened Zero Trust Communication Fabric (mTLS)
+All communication between agents, LWServers, and the central cloud platform is secured using a hardened Zero Trust model. Every service-to-service connection is authenticated and encrypted using **mutual TLS (mTLS)**. This means that every component must present a valid, signed client certificate to establish a connection, ensuring all data in transit is protected against interception. This prevents unauthorized access and man-in-the-middle attacks across the entire architecture.
 
 ### 5. LWServer Fleet Management
 - **Architectural Visibility:** A dedicated "LWServer Fleet" view visualizes the platform's critical middle tier. It provides a real-time dashboard of all deployed LWServers, which act as the secure aggregation and sanitization points between endpoint agents and the central cloud.
@@ -51,4 +51,15 @@ All communication between agents, LWServers, and the central cloud platform is s
 - **Playbook Engine & Auditing:** The server's core logic runs incoming alerts against active playbooks. When a playbook is triggered, a "Playbook Triggered" event is logged in the Server Intelligence feed for a complete audit trail.
 
 ### 7. Advanced Agent Fleet Management
-- **Enterprise-Grade Asset Table:** A dedicated "Agent Fleet" view provides a powerful interface for managing a diverse fleet of simulated agents (Windows, Linux, macOS
+- **Enterprise-Grade Asset Table:** A dedicated "Agent Fleet" view provides a powerful interface for managing a diverse fleet of simulated agents (Windows, Linux, macOS, etc.).
+- **Rich Contextual Details:** Selecting an agent provides a detailed drill-down, including its full posture, recent alerts, and automated remediation history.
+- **Centralized Upgrades:** Initiate fleet-wide agent upgrades directly from the console, with a built-in compatibility matrix to prevent deployment issues.
+- **Integrated Case Management:** Create, assign, and resolve incident cases directly from an agent's alert feed, streamlining the response workflow.
+
+### 8. MITRE ATT&CK® Coverage View
+- **Strategic Threat Matrix:** A new "MITRE ATT&CK" view provides an interactive matrix that maps detected threats and automated responses to the industry-standard framework.
+- **Gap Analysis:** Instantly visualize your security posture: blue cells indicate detected techniques, and purple cells show techniques covered by an active SOAR playbook. This allows security teams to identify defensive gaps and prioritize where to build new automation.
+
+### 9. Copyright & License
+This project and its source code are the intellectual property of OpenProtectAI.
+**© 2024 OpenProtectAI. All Rights Reserved.**

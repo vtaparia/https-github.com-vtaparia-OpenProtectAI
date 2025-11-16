@@ -799,6 +799,7 @@ const App: React.FC = () => {
         setChatHistory(prev => [...prev, { role: MessageRole.USER, content: prompt }]);
         
         try {
+            // FIX: Pass the 'prompt' argument to 'getChatResponse' as required by its function signature.
             const stream = await getChatResponse(prompt);
             let modelResponse = '';
             setChatHistory(prev => [...prev, { role: MessageRole.MODEL, content: '' }]);
