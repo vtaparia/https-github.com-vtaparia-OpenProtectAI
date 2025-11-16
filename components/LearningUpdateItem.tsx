@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { ServerEvent, LearningUpdate, LearningSource, AllEventTypes } from '../types';
 import { IntelIcon } from './icons/IntelIcon';
@@ -22,6 +23,10 @@ const sourceStyles: Record<LearningSource, { bg: string; border: string; text: s
     'Exploit-DB': { bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', text: 'text-fuchsia-300', hoverBg: 'hover:bg-fuchsia-500/20' },
     'Antivirus Detections': { bg: 'bg-pink-500/10', border: 'border-pink-500/30', text: 'text-pink-300', hoverBg: 'hover:bg-pink-500/20' },
     'Grok AI Analysis': { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-300', hoverBg: 'hover:bg-indigo-500/20' },
+    'CrowdStrike Falcon': { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-300', hoverBg: 'hover:bg-red-500/20' },
+    'SentinelOne': { bg: 'bg-gray-500/10', border: 'border-gray-500/30', text: 'text-gray-300', hoverBg: 'hover:bg-gray-500/20' },
+    'Zeek/Suricata': { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-300', hoverBg: 'hover:bg-amber-500/20' },
+    'OSQuery': { bg: 'bg-lime-500/10', border: 'border-lime-500/30', text: 'text-lime-300', hoverBg: 'hover:bg-lime-500/20' },
 };
 
 const LearningUpdateItem: React.FC<LearningUpdateItemProps> = ({ event, onSelectItem }) => {

@@ -1,5 +1,6 @@
 
 
+
 export enum MessageRole {
   USER = 'user',
   MODEL = 'model',
@@ -68,7 +69,7 @@ export interface Alert {
   mitre_mapping?: MitreMapping;
 }
 
-export type LearningSource = 'MITRE ATT&CK' | 'VirusTotal' | 'AlienVault OTX' | 'CVE Database' | 'Splunk SIEM' | 'Microsoft Defender' | 'NVD/EPSS' | 'OSV' | 'Exploit-DB' | 'Antivirus Detections' | 'Grok AI Analysis';
+export type LearningSource = 'MITRE ATT&CK' | 'VirusTotal' | 'AlienVault OTX' | 'CVE Database' | 'Splunk SIEM' | 'Microsoft Defender' | 'NVD/EPSS' | 'OSV' | 'Exploit-DB' | 'Antivirus Detections' | 'Grok AI Analysis' | 'CrowdStrike Falcon' | 'SentinelOne' | 'Zeek/Suricata' | 'OSQuery';
 
 // --- SOAR PLAYBOOK TYPES ---
 export interface PlaybookCondition {

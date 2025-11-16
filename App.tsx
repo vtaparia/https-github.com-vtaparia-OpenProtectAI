@@ -2,6 +2,8 @@
 
 
 
+
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 // FIX: Added AgentUpgradeDirective to imports to allow for explicit typing.
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective, PlaybookVersion, AgentUpgradeDirective, PlaybookTrigger, PlaybookCondition } from './types';
@@ -185,6 +187,10 @@ const externalIntelSources: (Omit<LearningUpdate, 'details' | 'mitre_mapping'> &
     { source: 'Splunk SIEM', summary: 'Correlated low-and-slow C2 traffic across multiple tenants.'},
     { source: 'Antivirus Detections', summary: 'Increased global detections of SmokeLoader backdoor.'},
     { source: 'Grok AI Analysis', summary: 'Analyzed anomalous C2 traffic pattern; identified potential linkage to new APT campaign.' },
+    { source: 'CrowdStrike Falcon', summary: 'Correlated process side-loading behavior associated with APT29.' },
+    { source: 'SentinelOne', summary: 'New ML model detected novel obfuscation in PowerShell scripts.' },
+    { source: 'Zeek/Suricata', summary: 'Identified anomalous DNS tunneling patterns to a new C2 domain.' },
+    { source: 'OSQuery', summary: 'Fleet-wide query identified unexpected kernel module loaded on 3% of Linux servers.' },
 ];
 
 const vulnerabilityIntelSources: LearningUpdate[] = [
@@ -352,7 +358,6 @@ const App: React.FC = () => {
     const themeStyles = useMemo(() => getThemeStyles(theme, density), [theme, density]);
     
     // FIX: Memoize the active provider to avoid calling the function on every render.
-    // FIX: Corrected useMemo syntax by wrapping getActiveProvider in an arrow function to resolve a type inference issue.
     const activeProvider = useMemo(() => getActiveProvider(), []);
     
     const intervalRef = useRef<number | undefined>();
@@ -751,6 +756,7 @@ const App: React.FC = () => {
                         cases={cases}
                         onDeployClick={() => setDeploymentModalOpen(true)}
                         onSettingsClick={() => setSettingsModalOpen(true)}
+                        // FIX: The `setAnalyticsModalOpen` state setter was called without an argument, causing a runtime error. It now correctly receives `true` to open the modal.
                         onKnowledgeMeterClick={() => setAnalyticsModalOpen(true)}
                         themeStyles={themeStyles}
                     />

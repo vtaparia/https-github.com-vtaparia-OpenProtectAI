@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import AgentKnowledgeMeter from './AgentKnowledgeMeter';
 import ServerKnowledgeMeter from './ServerKnowledgeMeter';
@@ -10,6 +11,8 @@ import { SettingsIcon } from './icons/SettingsIcon';
 import CorrelationActivityGraph from './CorrelationActivityGraph';
 import { GlobeIcon } from './icons/GlobeIcon';
 import { CaseIcon } from './icons/CaseIcon';
+import KnowledgeGraph from './KnowledgeGraph';
+import { KnowledgeGraphIcon } from './icons/KnowledgeGraphIcon';
 
 interface DashboardViewProps {
   serverKnowledgeLevel: number;
@@ -93,7 +96,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                  <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
                     <h3 className={`text-base font-bold mb-3 flex items-center gap-2 ${themeStyles.textSecondary}`}>
                         <GlobeIcon />
@@ -103,6 +106,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
                  <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
                     <CorrelationActivityGraph activityData={correlationActivity} themeStyles={themeStyles} />
+                </div>
+                <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
+                    <h3 className={`text-base font-bold mb-3 flex items-center gap-2 ${themeStyles.textSecondary}`}>
+                        <KnowledgeGraphIcon />
+                        Global Knowledge Graph
+                    </h3>
+                    <KnowledgeGraph themeStyles={themeStyles} />
                 </div>
             </div>
         </div>
