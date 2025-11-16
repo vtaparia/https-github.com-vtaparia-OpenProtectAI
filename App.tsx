@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective, PlaybookVersion } from './types';
 import { getChatResponse, reinitializeChat, getActiveProvider } from './services/geminiService';
@@ -343,7 +344,8 @@ const App: React.FC = () => {
                 id: `se-${Date.now()}-directive-yara`,
                 type: 'DIRECTIVE_PUSH',
                 timestamp: new Date().toISOString(),
-                payload: { directive: yaraRuleDirective } as DirectivePush,
+                // FIX: Removed explicit type cast 'as DirectivePush' that was likely confusing the TypeScript compiler.
+                payload: { directive: yaraRuleDirective },
             };
             setServerEvents(prev => [...prev, directivePushEvent]);
         }
@@ -549,7 +551,8 @@ const App: React.FC = () => {
             id: `se-${Date.now()}-directive-upgrade`,
             type: 'DIRECTIVE_PUSH',
             timestamp: new Date().toISOString(),
-            payload: { directive } as DirectivePush
+            // FIX: Removed explicit type cast 'as DirectivePush' that was likely confusing the TypeScript compiler.
+            payload: { directive }
         };
         setServerEvents(prev => [...prev, pushEvent]);
         setUpgradeModalOpen(false);

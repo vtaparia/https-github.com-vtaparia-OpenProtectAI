@@ -17,6 +17,7 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 ### 2. SOAR Playbook Automation
 - **Automation Workspace:** A dedicated "Automation" view provides a user-friendly interface to create, edit, and manage simple, trigger-based automation rules (playbooks).
 - **No-Code Playbook Editor:** Define "If-This-Then-That" logic to orchestrate security responses. For example: `IF Alert.MITRE_ID IS "T1003.001" THEN Create Case AND Assign to "Tier 2 SOC"`.
+- **Playbook Version Control:** Every change to a playbook is saved as a new version with change notes. A full version history is available, allowing analysts to view past configurations and instantly roll back to any previous version.
 - **Playbook Engine & Auditing:** The server's core logic runs incoming alerts against active playbooks. When a playbook is triggered, a "Playbook Triggered" event is logged in the Server Intelligence feed for a complete audit trail.
 
 ### 3. Advanced Agent Fleet Management

@@ -28,24 +28,34 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.9.1</h2>
+          <h2 className="text-xl font-bold">What's New in v1.9.2</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">Documentation & Stability</h3>
+            <h3 className="text-lg font-bold text-gray-100">SOAR Playbook Version Control</h3>
             
-            <Feature title="Project Cleanup & Stability">
-                Removed numerous obsolete, duplicate, and empty component files that were causing potential build errors and cluttering the project. The application is now more stable and built from a cleaner, more logical file structure.
+            <Feature title="New! Playbook Versioning">
+                Playbooks now have a full version history. Editing a playbook creates a new, timestamped version with change notes instead of overwriting, preserving all previous configurations for audit and rollback.
             </Feature>
 
-            <Feature title="Documentation Polish">
-                The main README.md and other documentation files have been reviewed and polished for clarity, accuracy, and professionalism, ensuring they reflect the platform's full capabilities.
+            <Feature title="History & Rollback UI">
+                A new "History" button on each playbook opens a modal to view all previous versions. From this view, you can see change notes and instantly revert to any older version by setting it as active.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
+
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.1 - Documentation & Stability</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                <Feature title="Project Cleanup & Stability">
+                    Removed numerous obsolete, duplicate, and empty component files that were causing potential build errors and cluttering the project. The application is now more stable and built from a cleaner, more logical file structure.
+                </Feature>
+                <Feature title="Documentation Polish">
+                    The main README.md and other documentation files have been reviewed and polished for clarity, accuracy, and professionalism, ensuring they reflect the platform's full capabilities.
+                </Feature>
+            </div>
             
             <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.0 - Automation & Orchestration</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
