@@ -1,7 +1,9 @@
 
+
 import React from 'react';
 import { ServerEvent, LearningUpdate, LearningSource, AllEventTypes } from '../types';
 import { IntelIcon } from './icons/IntelIcon';
+import { MitreTag } from './MitreTag';
 
 interface LearningUpdateItemProps {
   event: ServerEvent;
@@ -38,9 +40,10 @@ const LearningUpdateItem: React.FC<LearningUpdateItemProps> = ({ event, onSelect
         <div className="flex-1">
           <p className={`text-sm font-semibold ${style.text}`}>Intel Update: {payload.source}</p>
           <p className="text-xs text-gray-300 mt-1">{payload.summary}</p>
-          <div className="flex items-center justify-end mt-2">
+          <div className="flex items-center justify-between mt-2">
+             {payload.mitre_mapping && <MitreTag mapping={payload.mitre_mapping} />}
             {/* Provided a locale to toLocaleTimeString for consistent time formatting. */}
-            <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString('en-US')}</span>
+            <span className="text-xs text-gray-500 ml-auto">{new Date(event.timestamp).toLocaleTimeString('en-US')}</span>
           </div>
         </div>
       </div>

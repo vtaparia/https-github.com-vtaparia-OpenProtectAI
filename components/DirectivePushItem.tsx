@@ -1,7 +1,7 @@
 
 
 import React from 'react';
-import { ServerEvent, DirectivePush, AllEventTypes, AgentUpgradeDirective } from '../types';
+import { ServerEvent, DirectivePush, AllEventTypes, AgentUpgradeDirective, YaraRuleUpdateDirective } from '../types';
 import { DirectiveIcon } from './icons/DirectiveIcon';
 
 interface DirectivePushItemProps {
@@ -22,6 +22,11 @@ const DirectivePushItem: React.FC<DirectivePushItemProps> = ({ event, onSelectIt
     title = 'Agent Upgrade Initiated';
     description = `Pushing upgrade to version ${upgradeDirective.version} for ${upgradeDirective.target_os} agents.`;
     details = `Version: ${upgradeDirective.version}`;
+  } else if (directive.type === 'YARA_RULE_UPDATE') {
+    const yaraDirective = directive as YaraRuleUpdateDirective;
+    title = 'YARA Rule Pushed';
+    description = `Pushing updated YARA rule "${yaraDirective.rule_name}" to agent fleet.`;
+    details = `Rule: ${yaraDirective.rule_name}`;
   }
 
   return (

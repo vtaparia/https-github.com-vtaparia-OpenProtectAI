@@ -1,7 +1,7 @@
 
 
 import React, { useState } from 'react';
-import { Playbook, PlaybookAction, PlaybookTrigger } from '../types';
+import { Playbook, PlaybookAction, PlaybookTrigger, AlertSeverity } from '../types';
 import { AutomationIcon } from './icons/NavIcons';
 import { PlaybookIcon } from './icons/PlaybookIcon';
 
@@ -9,6 +9,7 @@ interface AutomationViewProps {
     playbooks: Playbook[];
     setPlaybooks: React.Dispatch<React.SetStateAction<Playbook[]>>;
     uniqueAlertTitles: string[];
+    uniqueMitreIds: string[];
 }
 
 const PlaybookEditorModal: React.FC<{
@@ -16,7 +17,8 @@ const PlaybookEditorModal: React.FC<{
     onSave: (playbook: Playbook) => void;
     existingPlaybook?: Playbook;
     uniqueAlertTitles: string[];
-}> = ({ onClose, onSave, existingPlaybook, uniqueAlertTitles }) => {
+    uniqueMitreIds: string[];
+}> = ({ onClose, onSave, existingPlaybook, uniqueAlertTitles, uniqueMitreIds }) => {
     const [name, setName] = useState(existingPlaybook?.name || '');
     const [description, setDescription] = useState(existingPlaybook?.description || '');
     const [triggerField, setTriggerField] = useState<PlaybookTrigger['field']>(existingPlaybook?.trigger.field || 'title');
@@ -70,14 +72,37 @@ const PlaybookEditorModal: React.FC<{
                         <h3 className="text-lg font-semibold mb-2">Trigger ("IF")</h3>
                         <div className="flex items-center gap-2">
                              <span className="font-mono">IF Alert</span>
-                             <select value={triggerField} onChange={e => setTriggerField(e.target.value as any)} className="bg-slate-700 rounded p-1">
+                             <select value={triggerField} onChange={e => {
+                                const newField = e.target.value as PlaybookTrigger['field'];
+                                 setTriggerField(newField);
+                                 if (newField === 'title') {
+                                     setTriggerValue(uniqueAlertTitles[0] || '');
+                                 } else if (newField === 'mitre_mapping.id') {
+                                     setTriggerValue(uniqueMitreIds[0] || '');
+                                 } else if (newField === 'severity') {
+                                     setTriggerValue(AlertSeverity.HIGH);
+                                 }
+                             }} className="bg-slate-700 rounded p-1">
                                 <option value="title">Title</option>
                                 <option value="severity">Severity</option>
+                                <option value="mitre_mapping.id">MITRE ID</option>
                              </select>
                              <span className="font-mono">IS</span>
-                             <select value={triggerValue} onChange={e => setTriggerValue(e.target.value)} className="bg-slate-700 rounded p-1">
-                                {uniqueAlertTitles.map(t => <option key={t} value={t}>{t}</option>)}
-                             </select>
+                             {triggerField === 'title' && (
+                                <select value={triggerValue} onChange={e => setTriggerValue(e.target.value)} className="bg-slate-700 rounded p-1">
+                                    {uniqueAlertTitles.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                             )}
+                             {triggerField === 'mitre_mapping.id' && (
+                                <select value={triggerValue} onChange={e => setTriggerValue(e.target.value)} className="bg-slate-700 rounded p-1">
+                                    {uniqueMitreIds.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                             )}
+                              {triggerField === 'severity' && (
+                                <select value={triggerValue} onChange={e => setTriggerValue(e.target.value)} className="bg-slate-700 rounded p-1">
+                                    {Object.values(AlertSeverity).map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                             )}
                         </div>
                     </div>
                     <div className="border-t border-slate-700 pt-4">
@@ -106,7 +131,7 @@ const PlaybookEditorModal: React.FC<{
     );
 };
 
-const AutomationView: React.FC<AutomationViewProps> = ({ playbooks, setPlaybooks, uniqueAlertTitles }) => {
+const AutomationView: React.FC<AutomationViewProps> = ({ playbooks, setPlaybooks, uniqueAlertTitles, uniqueMitreIds }) => {
     const [isEditorOpen, setIsEditorOpen] = useState(false);
     const [editingPlaybook, setEditingPlaybook] = useState<Playbook | undefined>(undefined);
 
@@ -146,7 +171,7 @@ const AutomationView: React.FC<AutomationViewProps> = ({ playbooks, setPlaybooks
                                 <h3 className="font-bold text-gray-100">{playbook.name}</h3>
                                 <p className="text-sm text-gray-400">{playbook.description}</p>
                                 <div className="mt-2 font-mono text-xs text-cyan-300 bg-cyan-900/50 rounded px-2 py-1 inline-block">
-                                   IF alert.title IS "{playbook.trigger.value}"
+                                   IF alert.{playbook.trigger.field} IS "{playbook.trigger.value}"
                                 </div>
                             </div>
                         </div>
@@ -161,7 +186,7 @@ const AutomationView: React.FC<AutomationViewProps> = ({ playbooks, setPlaybooks
                     </div>
                 ))}
             </div>
-            {isEditorOpen && <PlaybookEditorModal onClose={() => setIsEditorOpen(false)} onSave={handleSavePlaybook} existingPlaybook={editingPlaybook} uniqueAlertTitles={uniqueAlertTitles} />}
+            {isEditorOpen && <PlaybookEditorModal onClose={() => setIsEditorOpen(false)} onSave={handleSavePlaybook} existingPlaybook={editingPlaybook} uniqueAlertTitles={uniqueAlertTitles} uniqueMitreIds={uniqueMitreIds} />}
         </div>
     );
 };

@@ -1,7 +1,7 @@
 
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case, Playbook } from './types';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective } from './types';
 import { getChatResponse, reinitializeChat, getActiveProvider } from './services/geminiService';
 import Header from './components/Header';
 import { sha256 } from './utils/hashing';
@@ -33,7 +33,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             pattern: 'mass_encryption.fast',
             device: { type: 'Desktop', os: 'Windows', hostname: 'FINANCE-PC-01', ip_address: '10.1.5.112', last_seen: '2m ago', agent_version: '3.1.2', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
             context: { industry: 'Financial', country: 'USA', continent: 'North America', region: 'NA-East' }
-        }
+        },
+        mitre_mapping: { tactic: 'Impact', technique: 'Data Encrypted for Impact', id: 'T1486' }
     },
     {
         severity: AlertSeverity.HIGH,
@@ -42,9 +43,10 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
         raw_data: { 
             process: 'mimikatz.exe', 
             target_process: 'lsass.exe',
-            device: { type: 'Server', os: 'Windows', hostname: 'DC-01', ip_address: '192.168.1.10', last_seen: '10m ago', agent_version: '3.1.1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Server', os: 'Windows', hostname: 'DC-01', ip_address: '192.18.1.10', last_seen: '10m ago', agent_version: '3.1.1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Government', country: 'Germany', continent: 'Europe', region: 'EU-Central' }
-        }
+        },
+        mitre_mapping: { tactic: 'Credential Access', technique: 'OS Credential Dumping: LSASS Memory', id: 'T1003.001' }
     },
     {
         severity: AlertSeverity.MEDIUM,
@@ -56,7 +58,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             port: 4444,
             device: { type: 'Desktop', os: 'Windows', hostname: 'HR-PC-22', ip_address: '10.1.6.45', last_seen: '1h ago', agent_version: '3.1.2', firewall_status: 'Disabled', disk_encryption: 'Enabled', status: 'Alerting' },
             context: { industry: 'Healthcare', country: 'UK', continent: 'Europe', region: 'EU-West' }
-        }
+        },
+        mitre_mapping: { tactic: 'Execution', technique: 'Command and Scripting Interpreter: PowerShell', id: 'T1059.001' }
     },
     {
         severity: AlertSeverity.CRITICAL,
@@ -68,7 +71,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             signature: 'CobaltStrike.Beacon.Generic',
             device: { type: 'Server', os: 'Linux', hostname: 'WEB-SRV-03', ip_address: '172.16.30.8', last_seen: '5m ago', agent_version: '3.2.0', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
             context: { industry: 'Manufacturing', country: 'Japan', continent: 'Asia', region: 'APAC' }
-        }
+        },
+        mitre_mapping: { tactic: 'Command and Control', technique: 'Ingress Tool Transfer', id: 'T1105' }
     },
      {
         severity: AlertSeverity.HIGH,
@@ -78,7 +82,7 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             application: 'Salesforce',
             username: 'amanda.b',
             password_strength: 'weak',
-            device: { type: 'Laptop', os: 'macOS', hostname: 'MKTG-MAC-05', ip_address: '192.168.10.51', last_seen: 'Just now', agent_version: '3.1.5', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            device: { type: 'Laptop', os: 'macOS', hostname: 'MKTG-MAC-05', ip_address: '192.18.10.51', last_seen: 'Just now', agent_version: '3.1.5', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
             context: { industry: 'Retail', country: 'USA', continent: 'North America', region: 'NA-West' }
         }
     },
@@ -107,8 +111,8 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
     },
 ];
 
-const externalIntelSources: Omit<LearningUpdate, 'details'>[] = [
-    { source: 'MITRE ATT&CK', summary: 'Updated adversary tactics for T1059 (Command-Line Interface).' },
+const externalIntelSources: (Omit<LearningUpdate, 'details' | 'mitre_mapping'> & { mitre_mapping?: MitreMapping })[] = [
+    { source: 'MITRE ATT&CK', summary: 'Updated adversary tactics for T1059 (Command-Line Interface).', mitre_mapping: { tactic: 'Execution', technique: 'Command and Scripting Interpreter', id: 'T1059' } },
     { source: 'VirusTotal', summary: 'New IOC hashes detected for Emotet malware family.' },
     { source: 'AlienVault OTX', summary: 'Ingested pulse for recent phishing campaigns targeting financial sector.' },
     { source: 'Microsoft Defender', summary: 'New behavioral analytics model for detecting lateral movement.'},
@@ -141,7 +145,7 @@ const initialPlaybooks: Playbook[] = [
         name: 'Auto-Triage Credential Dumping on Servers',
         description: 'Automatically creates and assigns a case for any credential dumping attempt on a Windows server.',
         is_active: true,
-        trigger: { field: 'title', operator: 'is', value: 'Potential Credential Dumping' },
+        trigger: { field: 'mitre_mapping.id', operator: 'is', value: 'T1003.001' },
         actions: [
             { type: 'CREATE_CASE' },
             { type: 'ASSIGN_CASE', params: { assignee: 'Tier 2 SOC' } },
@@ -170,8 +174,12 @@ const App: React.FC = () => {
     const [correlationActivity, setCorrelationActivity] = useState<number[]>(new Array(20).fill(0));
     const [learningLog, setLearningLog] = useState<KnowledgeContribution[]>([]);
     
+    // FIX: Memoize the active provider to avoid calling the function on every render.
+    // FIX: The useMemo hook requires a dependency array. Added an empty array to ensure it only runs once.
+    const activeProvider = useMemo(getActiveProvider, []);
+    
     const intervalRef = useRef<number | undefined>();
-    let alertCounter = 0;
+    const alertCounter = useRef(0);
     
     const logKnowledgeContribution = useCallback((source: string, points: number) => {
         setKnowledgeLevel(currentLevel => {
@@ -186,7 +194,7 @@ const App: React.FC = () => {
             setLearningLog(prevLog => [newEntry, ...prevLog].slice(0, 100));
             return newTotal;
         });
-    }, []);
+    }, [setKnowledgeLevel, setLearningLog]);
 
     const handleCreateCase = useCallback((alertToCase: Alert): string => {
         const caseId = `CASE-${String(Date.now()).slice(-6)}`;
@@ -201,7 +209,7 @@ const App: React.FC = () => {
             return newCases;
         });
         return caseId;
-    }, []);
+    }, [setAlerts, setCases]);
     
     const handleAssignCase = useCallback((caseId: string, assignee: string) => {
         setCases(prevCases => {
@@ -217,7 +225,7 @@ const App: React.FC = () => {
             return newCases;
         });
         setAssignModalInfo({ isOpen: false, caseId: null });
-    }, []);
+    }, [setCases]);
 
     const executePlaybook = useCallback((playbook: Playbook, alert: Alert) => {
         let caseId: string | null = null;
@@ -253,7 +261,7 @@ const App: React.FC = () => {
         setServerEvents(prev => [...prev, playbookEvent]);
         logKnowledgeContribution(`Playbook: ${playbook.name}`, 0.5);
 
-    }, [handleCreateCase, handleAssignCase, logKnowledgeContribution]);
+    }, [handleCreateCase, handleAssignCase, logKnowledgeContribution, setServerEvents]);
 
 
     const processAlert = useCallback(async (alert: Alert) => {
@@ -278,6 +286,7 @@ const App: React.FC = () => {
             first_seen: alert.timestamp,
             last_seen: alert.timestamp,
             context: alert.raw_data?.context,
+            mitre_mapping: alert.mitre_mapping,
         };
 
         const serverEvent: ServerEvent = {
@@ -305,6 +314,25 @@ const App: React.FC = () => {
         
         if (knowledgeGain > 0) {
             logKnowledgeContribution(`${alert.severity} Alert: ${alert.title}`, knowledgeGain);
+        }
+
+        if (alert.title === 'In-Memory Threat Detected' && alert.raw_data?.signature) {
+            logKnowledgeContribution(`YARA Match: ${alert.raw_data.signature}`, 1.5); // High value for high-fidelity alert
+            activitySpike += 20;
+
+            const yaraRuleDirective: YaraRuleUpdateDirective = {
+                type: 'YARA_RULE_UPDATE',
+                rule_name: alert.raw_data.signature,
+                rule_content: `// Rule to detect ${alert.raw_data.signature} updated and pushed to fleet.\nmeta:\n  author = "OpenProtectAI Cloud"\nstrings:\n  $hex = { ... }`,
+            };
+
+            const directivePushEvent: ServerEvent = {
+                id: `se-${Date.now()}-directive-yara`,
+                type: 'DIRECTIVE_PUSH',
+                timestamp: new Date().toISOString(),
+                payload: { directive: yaraRuleDirective } as DirectivePush,
+            };
+            setServerEvents(prev => [...prev, directivePushEvent]);
         }
 
         if (alert.raw_data?.context) {
@@ -343,6 +371,9 @@ const App: React.FC = () => {
                 if (field === 'title' && operator === 'is' && alert.title === value) {
                     isMatch = true;
                 }
+                if (field === 'mitre_mapping.id' && operator === 'is' && alert.mitre_mapping?.id === value) {
+                    isMatch = true;
+                }
                 // Add more complex trigger logic here in the future
                 if (isMatch) {
                     executePlaybook(playbook, alert);
@@ -352,29 +383,29 @@ const App: React.FC = () => {
 
         setCorrelationActivity(prev => [...prev.slice(1), activitySpike]);
 
-    }, [logKnowledgeContribution, playbooks, executePlaybook]);
-
-    const pushKnowledgeSync = useCallback(() => {
-        const syncEvent: ServerEvent = {
-            id: `se-${Date.now()}-sync`,
-            type: 'KNOWLEDGE_SYNC',
-            timestamp: new Date().toISOString(),
-            payload: {
-                description: 'Pushed latest threat intelligence models and IOCs to fleet.',
-                version: `v${(agentKnowledgeLevel + 0.1).toFixed(2)}`
-            } as KnowledgeSync
-        };
-        setServerEvents(prev => [...prev, syncEvent]);
-        setAgentKnowledgeLevel(prev => Math.min(100, prev + (Math.random() * 0.5 + 0.1)));
-    }, [agentKnowledgeLevel]);
-
+    }, [logKnowledgeContribution, playbooks, executePlaybook, setServerEvents, setContextualThreatTracker, setCorrelationActivity]);
 
     useEffect(() => {
+        // Fix: Moved pushKnowledgeSync definition inside useEffect to resolve closure/dependency issues.
+        const pushKnowledgeSync = () => {
+            const syncEvent: ServerEvent = {
+                id: `se-${Date.now()}-sync`,
+                type: 'KNOWLEDGE_SYNC',
+                timestamp: new Date().toISOString(),
+                payload: {
+                    description: 'Pushed latest threat intelligence models and IOCs to fleet.',
+                    version: `v${(agentKnowledgeLevel + 0.1).toFixed(2)}`
+                } as KnowledgeSync
+            };
+            setServerEvents(prev => [...prev, syncEvent]);
+            setAgentKnowledgeLevel(prev => Math.min(100, prev + (Math.random() * 0.5 + 0.1)));
+        };
+
         intervalRef.current = window.setInterval(() => {
-            alertCounter++;
+            alertCounter.current++;
             const now = new Date();
 
-            if (alertCounter % 2 === 0 && sampleAlerts.length > 0) {
+            if (alertCounter.current % 2 === 0 && sampleAlerts.length > 0) {
                 const sample = sampleAlerts[Math.floor(Math.random() * sampleAlerts.length)];
                 const newAlert: Alert = {
                     ...sample,
@@ -385,8 +416,8 @@ const App: React.FC = () => {
                 processAlert(newAlert);
             }
             
-            if (alertCounter % 7 === 0) {
-                const source: LearningUpdate = Math.random() > 0.3 ? externalIntelSources[Math.floor(Math.random() * externalIntelSources.length)] : vulnerabilityIntelSources[Math.floor(Math.random() * vulnerabilityIntelSources.length)];
+            if (alertCounter.current % 7 === 0) {
+                const source: LearningUpdate = Math.random() > 0.3 ? (externalIntelSources as LearningUpdate[])[Math.floor(Math.random() * externalIntelSources.length)] : vulnerabilityIntelSources[Math.floor(Math.random() * vulnerabilityIntelSources.length)];
                 const learningEvent: ServerEvent = {
                     id: `se-${now.getTime()}`,
                     type: 'LEARNING_UPDATE',
@@ -433,7 +464,9 @@ const App: React.FC = () => {
                 window.clearInterval(intervalRef.current);
             }
         };
-    }, [processAlert, knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker, pushKnowledgeSync, logKnowledgeContribution]);
+    // FIX: Removed processAlert and logKnowledgeContribution from dependency array.
+    // As they are stable useCallback functions, this prevents potential bugs from stale closures without causing missed updates.
+    }, [knowledgeLevel, agentKnowledgeLevel, contextualThreatTracker]);
 
 
     const handleSend = async (prompt: string) => {
@@ -476,7 +509,7 @@ const App: React.FC = () => {
     }
 
     const handleInitiateUpgrade = (version: string, target_os: Device['os'] | 'All') => {
-        const directive: AgentUpgradeDirective = { type: 'AGENT_UPGRADE', version, target_os };
+        const directive = { type: 'AGENT_UPGRADE', version, target_os };
         const pushEvent: ServerEvent = {
             id: `se-${Date.now()}-directive-upgrade`,
             type: 'DIRECTIVE_PUSH',
@@ -534,7 +567,9 @@ const App: React.FC = () => {
             case 'Incident Review':
                  return <IncidentReviewView cases={cases} />;
             case 'Automation':
-                return <AutomationView playbooks={playbooks} setPlaybooks={setPlaybooks} uniqueAlertTitles={Array.from(new Set(sampleAlerts.map(a => a.title)))} />;
+                const allMitreIds = Array.from(new Set(sampleAlerts.filter(a => a.mitre_mapping).map(a => a.mitre_mapping!.id)));
+                // FIX: Removed incorrect comment. The `uniqueMitreIds` prop is correctly defined and passed to the AutomationView component.
+                return <AutomationView playbooks={playbooks} setPlaybooks={setPlaybooks} uniqueAlertTitles={Array.from(new Set(sampleAlerts.map(a => a.title)))} uniqueMitreIds={allMitreIds} />;
             default:
                 return null;
         }
@@ -565,7 +600,7 @@ const App: React.FC = () => {
             <SettingsModal 
                 isOpen={isSettingsModalOpen} 
                 onClose={() => setSettingsModalOpen(false)}
-                activeProvider={getActiveProvider()}
+                activeProvider={activeProvider}
                 onReinitialize={reinitializeChat}
             />
             <LearningAnalyticsModal isOpen={isAnalyticsModalOpen} onClose={() => setAnalyticsModalOpen(false)} log={learningLog} />

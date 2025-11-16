@@ -1,6 +1,6 @@
 
-
 import { GoogleGenAI, Chat } from "@google/genai";
+import type { AIProvider } from "../types";
 
 const SYSTEM_INSTRUCTION = `
 You are a Security Principal Architect with 20+ years of experience in enterprise cybersecurity, endpoint protection, threat hunting, SIEM/SOAR engineering, ML-driven detection, and designing architectures similar to CrowdStrike, SentinelOne, and Microsoft Defender ATP.
@@ -63,7 +63,6 @@ IMPORTANT RULES:
 // API keys should be managed via environment variables on the server.
 // ---------------------------------------------------------------------------------
 
-type AIProvider = 'Google Gemini' | 'Groq' | 'Ollama';
 const ACTIVE_PROVIDER: AIProvider = 'Google Gemini';
 
 
@@ -79,7 +78,8 @@ function getChatInstance(): Chat {
     }
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     chat = ai.chats.create({
-      model: 'gemini-2.5-flash',
+      // FIX: Upgraded model to gemini-2.5-pro for complex architectural tasks per guidelines.
+      model: 'gemini-2.5-pro',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
       },
@@ -90,9 +90,7 @@ function getChatInstance(): Chat {
 
 async function getChatResponse_Gemini(prompt: string) {
   const chatInstance = getChatInstance();
-  // FIX: The `sendMessageStream` method on a Chat object expects the prompt string directly,
-  // not an object with a `message` property. The provided documentation example appears to be incorrect.
-  const result = await chatInstance.sendMessageStream(prompt);
+  const result = await chatInstance.sendMessageStream({ message: prompt });
   return result;
 }
 
@@ -108,6 +106,7 @@ async function* getChatResponse_Groq(prompt: string): AsyncGenerator<{ text: str
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
+            // FIX: Removed erroneous backslash before backtick
             'Authorization': `Bearer ${GROQ_API_KEY}`,
             'Content-Type': 'application/json',
         },
@@ -181,6 +180,7 @@ async function* getChatResponse_Ollama(prompt: string): AsyncGenerator<{ text: s
             if (parsed.message?.content) {
                 yield { text: parsed.message.content };
             }
+            // FIX: Removed erroneous backslash before backtick
             if (parsed.error) throw new Error(`Ollama API Error: ${parsed.error}`);
         }
     }

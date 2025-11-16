@@ -3,6 +3,7 @@
 import React from 'react';
 import { ServerEvent, AggregatedEvent, AllEventTypes } from '../types';
 import { ServerIcon } from './icons/ServerIcon';
+import { MitreTag } from './MitreTag';
 
 interface LWServerEventItemProps {
   event: ServerEvent;
@@ -29,9 +30,12 @@ const LWServerEventItem: React.FC<LWServerEventItemProps> = ({ event, onSelectIt
             </p>
           )}
            <div className="flex items-center justify-between mt-2">
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
-              {payload.severity}
-            </span>
+             <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                  {payload.severity}
+                </span>
+                {payload.mitre_mapping && <MitreTag mapping={payload.mitre_mapping} />}
+             </div>
             {/* Provided a locale to toLocaleTimeString for consistent time formatting. */}
             <span className="text-xs text-gray-500">{new Date(event.timestamp).toLocaleTimeString('en-US')}</span>
           </div>

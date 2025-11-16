@@ -51,6 +51,12 @@ export interface AlertContext {
     region: string;
 }
 
+export interface MitreMapping {
+    tactic: string;
+    technique: string;
+    id: string; // e.g., "T1059.001"
+}
+
 export interface Alert {
   id: string;
   severity: AlertSeverity;
@@ -59,13 +65,14 @@ export interface Alert {
   timestamp: string;
   raw_data?: Record<string, any> & { device: Device; context: AlertContext }; 
   caseId?: string;
+  mitre_mapping?: MitreMapping;
 }
 
 export type LearningSource = 'MITRE ATT&CK' | 'VirusTotal' | 'AlienVault OTX' | 'CVE Database' | 'Splunk SIEM' | 'Microsoft Defender' | 'NVD/EPSS' | 'OSV' | 'Exploit-DB' | 'Antivirus Detections' | 'Grok AI Analysis';
 
 // --- SOAR PLAYBOOK TYPES ---
 export interface PlaybookTrigger {
-    field: 'title' | 'severity' | 'device.os';
+    field: 'title' | 'severity' | 'device.os' | 'mitre_mapping.id';
     operator: 'is' | 'is_not';
     value: string;
 }
@@ -110,6 +117,7 @@ export interface AggregatedEvent {
   first_seen: string;
   last_seen: string;
   context?: AlertContext;
+  mitre_mapping?: MitreMapping;
 }
 
 // Represents the central server learning from external sources
@@ -117,6 +125,7 @@ export interface LearningUpdate {
   source: LearningSource;
   summary: string;
   details?: VulnerabilityDetails;
+  mitre_mapping?: MitreMapping;
 }
 
 export interface VulnerabilityDetails {
@@ -126,15 +135,21 @@ export interface VulnerabilityDetails {
     advisory_link: string;
 }
 
-// Represents the server pushing new intelligence to agents
-export type AgentUpgradeDirective = {
+// --- DIRECTIVE TYPES ---
+export interface AgentUpgradeDirective {
     type: 'AGENT_UPGRADE';
     version: string;
     target_os: Device['os'] | 'All';
 };
 
-// Add other directive types here in the future, e.g., | YaraUpdateDirective
-export type DirectivePayload = AgentUpgradeDirective;
+export interface YaraRuleUpdateDirective {
+    type: 'YARA_RULE_UPDATE';
+    rule_name: string;
+    rule_content: string; // For simulation, this can be a summary
+}
+
+// Represents the server pushing new intelligence to agents
+export type DirectivePayload = AgentUpgradeDirective | YaraRuleUpdateDirective;
 
 export interface DirectivePush {
     directive: DirectivePayload;
@@ -172,3 +187,6 @@ export interface AutomatedRemediation {
 
 
 export type AllEventTypes = Alert | ServerEvent;
+
+// FIX: Centralize AIProvider type definition
+export type AIProvider = 'Google Gemini' | 'Groq' | 'Ollama';

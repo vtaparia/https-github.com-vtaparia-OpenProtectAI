@@ -1,10 +1,9 @@
 
-
 # OpenProtectAI
 
 A dynamic, enterprise-ready admin console that simulates an AI-powered, self-learning cybersecurity platform, complete with an expert AI assistant for real-time architectural design and guidance.
 
-This project demonstrates a sophisticated "single pane of glass" UI for monitoring and managing a global fleet of security agents, visualizing the server's intelligence-gathering process, and interacting with a powerful AI architect.
+This project demonstrates a sophisticated "single pane of glass" UI for monitoring and managing a global fleet of security agents, visualizing the server's intelligence-gathering process, and orchestrating automated responses to threats.
 
 **[➡️ View API Documentation](./docs/api.md)**
 
@@ -12,12 +11,12 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 
 ### 1. Unified Enterprise Console
 - **Professional "Single Pane of Glass" UI:** A modern, intuitive layout designed for security operations, providing a comprehensive overview of the entire security ecosystem.
-- **Asset-Centric Navigation:** A master sidebar allows for seamless switching between core views: a high-level **Dashboard**, a detailed **Agent Fleet** management interface, the deep-dive **Server Intelligence** feed, and the new **Automation** workspace.
-- **Persistent AI Assistant:** A collapsible chat panel provides constant access to the Cyber Architect AI for architectural questions, code generation, and deployment guidance without leaving the console.
+- **Asset-Centric Navigation:** A master sidebar allows for seamless switching between core views: a high-level **Dashboard**, a detailed **Agent Fleet** management interface, the deep-dive **Server Intelligence** feed, and the powerful **Automation** workspace.
+- **Persistent AI Assistant:** A collapsible chat panel provides constant access to the OpenProtectAI assistant for architectural questions, code generation, and deployment guidance without leaving the console.
 
 ### 2. SOAR Playbook Automation
-- **Automation Workspace:** A new "Automation" view provides a user-friendly interface to create and manage simple, trigger-based automation rules (playbooks).
-- **No-Code Playbook Editor:** Define "If-This-Then-That" logic to orchestrate security responses. For example: `IF Alert.Title IS "Potential Credential Dumping" THEN Create Case AND Assign to "Tier 2 SOC"`.
+- **Automation Workspace:** A dedicated "Automation" view provides a user-friendly interface to create, edit, and manage simple, trigger-based automation rules (playbooks).
+- **No-Code Playbook Editor:** Define "If-This-Then-That" logic to orchestrate security responses. For example: `IF Alert.MITRE_ID IS "T1003.001" THEN Create Case AND Assign to "Tier 2 SOC"`.
 - **Playbook Engine & Auditing:** The server's core logic runs incoming alerts against active playbooks. When a playbook is triggered, a "Playbook Triggered" event is logged in the Server Intelligence feed for a complete audit trail.
 
 ### 3. Advanced Agent Fleet Management
@@ -28,9 +27,9 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 
 ### 4. Incident Response & Case Management
 - **One-Click Case Creation:** Analysts can create an investigation "Case" from any high or critical severity alert directly within the Agent Fleet view.
-- **Case Assignment Workflow:** New cases can be assigned to specific security analysts. Assigned cases automatically transition to an "In Progress" state, and the assignee is clearly displayed on the alert.
+- **Case Assignment Workflow:** New cases can be assigned to specific security analysts or teams. Assigned cases automatically transition to an "In Progress" state, and the assignee is clearly displayed on the alert.
 - **Case Resolution:** Analysts can resolve "In Progress" cases, adding mandatory resolution notes to close out the investigation and move the incident to the audit trail.
-- **Incident Review & Audit Trail:** A new "Incident Review" view provides a dedicated workspace for SOC managers to review, search, and audit all resolved cases, providing a complete historical record for compliance and post-mortem analysis.
+- **Incident Review & Audit Trail:** A dedicated "Incident Review" view provides a workspace for SOC managers to review, search, and audit all resolved cases, providing a complete historical record for compliance and post-mortem analysis.
 - **Open Cases Dashboard:** The main dashboard includes a real-time summary of open cases by status (New / Unassigned, In Progress, Resolved), providing an at-a-glance overview of the SOC's active workload.
 
 ### 5. Real-Time Intelligence & Analytics
@@ -42,10 +41,10 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 - **Click-to-Explore:** Click on any event in any feed to open a focused, full-detail view of its underlying logs and payload data.
 
 ### 6. Simulated Self-Learning Engine
-- **Bidirectional Communication:** The UI visualizes the complete security loop: agents send telemetry, the server learns, and the server pushes actionable intelligence back to the agents.
+- **Bidirectional Communication:** The UI visualizes the complete security loop: agents send telemetry, the server learns, and the server pushes actionable intelligence (like YARA rule updates) back to the agents.
 - **Multi-Source Intelligence Fusion:** The simulation demonstrates the server learning from a wide array of external sources, including **MITRE ATT&CK, NVD, EPSS, Exploit-DB, VirusTotal, Grok AI Analysis,** and other security vendors.
 - **Context-Aware AI:** The server learns from the geographical and industry context of threats to issue targeted, proactive alerts to agents in high-risk trajectories.
-- **Automated Security Actions:** The simulation visualizes the server taking automated actions for the most critical threats, such as triggering a host remediation.
+- **Automated Security Actions:** The simulation visualizes the server taking automated actions for the most critical threats, such as triggering a host remediation or enforcing a Zero Trust policy.
 
 ### 7. Operational & Deployment Tooling
 - **Agent Deployment Modal:** A user-friendly modal to generate copy-paste-ready deployment scripts for multiple platforms.

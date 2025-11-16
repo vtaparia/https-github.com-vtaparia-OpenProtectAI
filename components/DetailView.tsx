@@ -1,8 +1,9 @@
 
 
 import React from 'react';
-import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation, PlaybookTriggered } from '../types';
+import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation, PlaybookTriggered, MitreMapping } from '../types';
 import PayloadDetailsView from './PayloadDetailsView';
+import { MitreTag } from './MitreTag';
 
 interface DetailViewProps {
   item: AllEventTypes;
@@ -29,6 +30,19 @@ const VulnerabilityDetailsDisplay: React.FC<{ details: VulnerabilityDetails }> =
     </div>
 );
 
+const MitreMappingDisplay: React.FC<{ mapping: MitreMapping }> = ({ mapping }) => (
+     <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 mb-4">
+        <h4 className="text-sm font-semibold text-gray-400 mb-2">MITRE ATT&CK® Mapping</h4>
+        <div className="text-sm space-y-1 font-mono">
+            <DetailRow label="Tactic" value={mapping.tactic} />
+            <DetailRow label="Technique" value={mapping.technique} />
+            <DetailRow label="ID">
+                <MitreTag mapping={mapping} isLink={true} />
+            </DetailRow>
+        </div>
+    </div>
+);
+
 const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
 
     const renderItemDetails = () => {
@@ -38,6 +52,7 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                 <div>
                     <h3 className="text-lg font-bold text-gray-200 mb-2">{alert.title}</h3>
                     <p className="text-sm text-gray-400 mb-4">{alert.description}</p>
+                    {alert.mitre_mapping && <MitreMappingDisplay mapping={alert.mitre_mapping} />}
                     <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
                          <h4 className="text-sm font-semibold text-gray-400 mb-2">Raw Log Details</h4>
                          <PayloadDetailsView payload={alert.raw_data || {}} />
@@ -58,6 +73,7 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                                     <DetailRow label="Region" value={`${payload.context.region}, ${payload.context.country}`} />
                                 </div>
                              )}
+                             {payload.mitre_mapping && <MitreMappingDisplay mapping={payload.mitre_mapping} />}
                              <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
                                 <h4 className="text-sm font-semibold text-gray-400 mb-2">Sanitized & Aggregated Data</h4>
                                 <PayloadDetailsView payload={payload.sanitized_data} />
@@ -71,6 +87,7 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                         <div>
                              <h3 className="text-lg font-bold text-gray-200 mb-2">Intel Update: {payload.source}</h3>
                              <p className="text-sm text-gray-400 mb-4">{payload.summary}</p>
+                             {payload.mitre_mapping && <MitreMappingDisplay mapping={payload.mitre_mapping} />}
                              <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
                                 <h4 className="text-sm font-semibold text-gray-400 mb-2">Intelligence Payload</h4>
                                 {payload.details ? <VulnerabilityDetailsDisplay details={payload.details} /> : <PayloadDetailsView payload={payload} /> }
@@ -113,6 +130,9 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                     if (directive.type === 'AGENT_UPGRADE') {
                         title = "Agent Upgrade Initiated";
                         description = `Server commanded agents to upgrade to version ${directive.version}.`;
+                    } else if (directive.type === 'YARA_RULE_UPDATE') {
+                        title = "YARA Rule Update Dispatched";
+                        description = `Server commanded agents to update YARA rule: ${directive.rule_name}.`;
                     }
                     return (
                        <div>
