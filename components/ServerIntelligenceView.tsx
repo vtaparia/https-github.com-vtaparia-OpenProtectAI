@@ -13,9 +13,11 @@ import PlaybookTriggeredItem from './PlaybookTriggeredItem';
 interface ServerIntelligenceViewProps {
   events: ServerEvent[];
   onSelectItem: (item: AllEventTypes) => void;
+  // FIX: Added themeStyles to props to match what is passed from App.tsx.
+  themeStyles: Record<string, string>;
 }
 
-const ServerIntelligenceView: React.FC<ServerIntelligenceViewProps> = ({ events, onSelectItem }) => {
+const ServerIntelligenceView: React.FC<ServerIntelligenceViewProps> = ({ events, onSelectItem, themeStyles }) => {
 
   const reversedEvents = [...events].reverse();
 

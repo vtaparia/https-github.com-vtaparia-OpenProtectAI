@@ -22,6 +22,7 @@ import ResolveCaseModal from './components/ResolveCaseModal';
 import IncidentReviewView from './components/IncidentReviewView';
 import AutomationView from './components/AutomationView';
 import MitreAttackView from './components/MitreAttackView';
+import { Theme, Density, getThemeStyles } from './theme';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -319,10 +320,24 @@ const App: React.FC = () => {
     const [contextualThreatTracker, setContextualThreatTracker] = useState<Record<string, { count: number; titles: Set<string> }>>({});
     const [correlationActivity, setCorrelationActivity] = useState<number[]>(new Array(20).fill(0));
     const [learningLog, setLearningLog] = useState<KnowledgeContribution[]>([]);
+
+    const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'dark');
+    const [density, setDensity] = useState<Density>(() => (localStorage.getItem('density') as Density) || 'comfortable');
+
+    useEffect(() => {
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+    
+    useEffect(() => {
+        localStorage.setItem('density', density);
+    }, [density]);
+    
+    const themeStyles = useMemo(() => getThemeStyles(theme, density), [theme, density]);
     
     // FIX: Memoize the active provider to avoid calling the function on every render.
     // FIX: The useMemo hook requires a dependency array. Added an empty array to ensure it only runs once.
-    const activeProvider = useMemo(getActiveProvider, []);
+    // FIX: Corrected useMemo syntax by wrapping getActiveProvider in an arrow function to resolve a type inference issue.
+    const activeProvider = useMemo(() => getActiveProvider(), []);
     
     const intervalRef = useRef<number | undefined>();
     const alertCounter = useRef(0);
@@ -721,6 +736,7 @@ const App: React.FC = () => {
                         onDeployClick={() => setDeploymentModalOpen(true)}
                         onSettingsClick={() => setSettingsModalOpen(true)}
                         onKnowledgeMeterClick={() => setAnalyticsModalOpen(true)}
+                        themeStyles={themeStyles}
                     />
                 );
             case 'Agent Fleet':
@@ -732,33 +748,35 @@ const App: React.FC = () => {
                             onCreateCase={handleCreateCase}
                             onAssignCaseClick={(caseId) => setAssignModalInfo({ isOpen: true, caseId })}
                             onResolveCaseClick={(caseId) => setResolveModalInfo({ isOpen: true, caseId })}
+                            themeStyles={themeStyles}
                         />;
             case 'Server Intelligence':
-                 return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} />;
+                 return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} themeStyles={themeStyles} />;
             case 'Incident Review':
-                 return <IncidentReviewView cases={cases} />;
+                 return <IncidentReviewView cases={cases} themeStyles={themeStyles} />;
             case 'MITRE ATT&CK':
-                return <MitreAttackView alerts={alerts} playbooks={playbooks} />;
+                return <MitreAttackView alerts={alerts} playbooks={playbooks} themeStyles={themeStyles} />;
             case 'Automation':
                 const allMitreIds = Array.from(new Set(sampleAlerts.filter(a => a.mitre_mapping).map(a => a.mitre_mapping!.id)));
                 // FIX: Removed incorrect comment. The `uniqueMitreIds` prop is correctly defined and passed to the AutomationView component.
-                return <AutomationView playbooks={playbooks} setPlaybooks={setPlaybooks} uniqueAlertTitles={Array.from(new Set(sampleAlerts.map(a => a.title)))} uniqueMitreIds={allMitreIds} />;
+                return <AutomationView playbooks={playbooks} setPlaybooks={setPlaybooks} uniqueAlertTitles={Array.from(new Set(sampleAlerts.map(a => a.title)))} uniqueMitreIds={allMitreIds} themeStyles={themeStyles} />;
             default:
                 return null;
         }
     }
 
     return (
-        <div className="h-screen w-screen flex flex-col bg-slate-900 text-gray-200 font-sans">
-            <Header onVersionClick={() => setReleaseNotesModalOpen(true)} />
+        <div className={`h-screen w-screen flex flex-col font-sans ${themeStyles.bgPrimary} ${themeStyles.textPrimary}`}>
+            <Header onVersionClick={() => setReleaseNotesModalOpen(true)} themeStyles={themeStyles} />
             <main className="flex-1 flex overflow-hidden">
                 <NavigationSidebar 
                     activeView={activeView} 
                     onViewChange={handleViewChange} 
+                    themeStyles={themeStyles}
                 />
-                <div className="flex-1 flex flex-col overflow-y-auto p-4 gap-4">
+                <div className={`flex-1 flex flex-col overflow-y-auto ${themeStyles.p} ${themeStyles.gap}`}>
                      {selectedDetailItem && activeView === 'Server Intelligence' ? (
-                        <DetailView item={selectedDetailItem} onReturn={() => setSelectedDetailItem(null)} />
+                        <DetailView item={selectedDetailItem} onReturn={() => setSelectedDetailItem(null)} themeStyles={themeStyles} />
                      ) : (
                         renderMainView()
                      )}
@@ -768,6 +786,7 @@ const App: React.FC = () => {
                 chatHistory={chatHistory}
                 isLoading={isLoading}
                 onSend={handleSend}
+                themeStyles={themeStyles}
              />
             <DeploymentModal isOpen={isDeploymentModalOpen} onClose={() => setDeploymentModalOpen(false)} />
             <SettingsModal 
@@ -775,6 +794,10 @@ const App: React.FC = () => {
                 onClose={() => setSettingsModalOpen(false)}
                 activeProvider={activeProvider}
                 onReinitialize={reinitializeChat}
+                theme={theme}
+                setTheme={setTheme}
+                density={density}
+                setDensity={setDensity}
             />
             <LearningAnalyticsModal isOpen={isAnalyticsModalOpen} onClose={() => setAnalyticsModalOpen(false)} log={learningLog} />
             <ReleaseNotesModal isOpen={isReleaseNotesModalOpen} onClose={() => setReleaseNotesModalOpen(false)} />

@@ -1,12 +1,15 @@
 
+
 import React, { useMemo, useState } from 'react';
 import { Case, CaseStatus } from '../types';
 
 interface IncidentReviewViewProps {
     cases: Map<string, Case>;
+    // FIX: Added themeStyles to props to match what is passed from App.tsx.
+    themeStyles: Record<string, string>;
 }
 
-const IncidentReviewView: React.FC<IncidentReviewViewProps> = ({ cases }) => {
+const IncidentReviewView: React.FC<IncidentReviewViewProps> = ({ cases, themeStyles }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const resolvedCases = useMemo(() => {

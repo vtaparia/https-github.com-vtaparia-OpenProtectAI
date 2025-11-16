@@ -1,0 +1,103 @@
+export const themes = {
+    dark: {
+        'name': 'Default Dark',
+        'bgPrimary': 'bg-slate-900',
+        'bgSecondary': 'bg-slate-800',
+        'bgSecondaryBackdrop': 'bg-slate-800/50 backdrop-blur-lg',
+        'bgPanel': 'bg-slate-900/50',
+        'bgInteractive': 'bg-slate-700/50',
+        'bgInteractiveHover': 'hover:bg-slate-700',
+        'headerBg': 'bg-slate-900/75 backdrop-blur-lg',
+        'navBg': 'bg-slate-900/75',
+        'navActiveBg': 'bg-cyan-600/50',
+        'navHoverBg': 'hover:bg-slate-700/50',
+        'textPrimary': 'text-gray-200',
+        'textSecondary': 'text-gray-400',
+        'textHeading': 'text-gray-100',
+        'textAccent': 'text-cyan-300',
+        'border': 'border border-slate-700/50',
+        'borderBottom': 'border-b border-slate-700/50',
+        'borderRight': 'border-r border-slate-700/50',
+        'buttonPrimary': 'bg-cyan-600 hover:bg-cyan-500 text-white',
+        'buttonSecondary': 'bg-slate-700/50 hover:bg-slate-700 text-cyan-400',
+        'interactive_panel': 'hover:bg-slate-800/50',
+        'meterBg': 'bg-gray-700',
+    },
+    light: {
+        'name': 'Light Mode',
+        'bgPrimary': 'bg-slate-100',
+        'bgSecondary': 'bg-white',
+        'bgSecondaryBackdrop': 'bg-white/80 backdrop-blur-lg',
+        'bgPanel': 'bg-white',
+        'bgInteractive': 'bg-slate-200/50',
+        'bgInteractiveHover': 'hover:bg-slate-200',
+        'headerBg': 'bg-white/75 backdrop-blur-lg',
+        'navBg': 'bg-white/75',
+        'navActiveBg': 'bg-cyan-500',
+        'navHoverBg': 'hover:bg-slate-200/50',
+        'textPrimary': 'text-slate-800',
+        'textSecondary': 'text-slate-500',
+        'textHeading': 'text-slate-900',
+        'textAccent': 'text-white',
+        'border': 'border border-slate-300',
+        'borderBottom': 'border-b border-slate-300',
+        'borderRight': 'border-r border-slate-300',
+        'buttonPrimary': 'bg-cyan-600 hover:bg-cyan-500 text-white',
+        'buttonSecondary': 'bg-slate-200 hover:bg-slate-300 text-cyan-700',
+        'interactive_panel': 'hover:bg-slate-200/50',
+        'meterBg': 'bg-slate-300',
+    },
+    twilight: {
+        'name': 'Twilight Blue',
+        'bgPrimary': 'bg-blue-950',
+        'bgSecondary': 'bg-blue-900',
+        'bgSecondaryBackdrop': 'bg-blue-900/50 backdrop-blur-lg',
+        'bgPanel': 'bg-sky-950/50',
+        'bgInteractive': 'bg-sky-800/50',
+        'bgInteractiveHover': 'hover:bg-sky-800',
+        'headerBg': 'bg-blue-950/75 backdrop-blur-lg',
+        'navBg': 'bg-blue-950/75',
+        'navActiveBg': 'bg-indigo-600/50',
+        'navHoverBg': 'hover:bg-sky-900/50',
+        'textPrimary': 'text-blue-200',
+        'textSecondary': 'text-blue-400',
+        'textHeading': 'text-white',
+        'textAccent': 'text-indigo-300',
+        'border': 'border border-blue-800/50',
+        'borderBottom': 'border-b border-blue-800/50',
+        'borderRight': 'border-r border-blue-800/50',
+        'buttonPrimary': 'bg-indigo-600 hover:bg-indigo-500 text-white',
+        'buttonSecondary': 'bg-sky-800/50 hover:bg-sky-800 text-indigo-300',
+        'interactive_panel': 'hover:bg-sky-900/50',
+        'meterBg': 'bg-blue-800',
+    }
+};
+
+export const densities = {
+    compact: {
+        p: 'p-2',
+        py: 'py-2',
+        px: 'px-2',
+        pxy_sm: 'px-2 py-1',
+        gap: 'gap-2',
+        text: 'text-xs',
+    },
+    comfortable: {
+        p: 'p-4',
+        py: 'py-4',
+        px: 'px-4',
+        pxy_sm: 'px-3 py-2',
+        gap: 'gap-4',
+        text: 'text-sm',
+    },
+};
+
+export type Theme = keyof typeof themes;
+export type Density = keyof typeof densities;
+
+export const getThemeStyles = (theme: Theme, density: Density): Record<string, string> => {
+    return {
+        ...themes[theme],
+        ...densities[density],
+    };
+};

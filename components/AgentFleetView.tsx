@@ -20,6 +20,8 @@ interface AgentFleetViewProps {
   onCreateCase: (alert: Alert) => void;
   onAssignCaseClick: (caseId: string) => void;
   onResolveCaseClick: (caseId: string) => void;
+  // FIX: Added themeStyles to props to match what is passed from App.tsx.
+  themeStyles: Record<string, string>;
 }
 
 const osIcons: Record<Device['os'], React.FC> = {
@@ -35,7 +37,7 @@ const osIcons: Record<Device['os'], React.FC> = {
 type SortKey = keyof Device | 'hostname';
 type SortDirection = 'asc' | 'desc';
 
-const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, cases, onUpgradeClick, onCreateCase, onAssignCaseClick, onResolveCaseClick }) => {
+const AgentFleetView: React.FC<AgentFleetViewProps> = ({ alerts, serverEvents, cases, onUpgradeClick, onCreateCase, onAssignCaseClick, onResolveCaseClick, themeStyles }) => {
   const [selectedAgent, setSelectedAgent] = useState<Device | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [osFilter, setOsFilter] = useState<Device['os'] | 'All'>('All');

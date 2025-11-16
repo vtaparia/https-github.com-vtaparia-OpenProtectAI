@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation, PlaybookTriggered, MitreMapping } from '../types';
 import PayloadDetailsView from './PayloadDetailsView';
@@ -6,6 +7,8 @@ import { MitreTag } from './MitreTag';
 interface DetailViewProps {
   item: AllEventTypes;
   onReturn: () => void;
+  // FIX: Added themeStyles to props to match what is passed from App.tsx.
+  themeStyles: Record<string, string>;
 }
 
 const DetailRow: React.FC<{ label: string; value?: React.ReactNode; children?: React.ReactNode }> = ({ label, value, children }) => (
@@ -41,7 +44,7 @@ const MitreMappingDisplay: React.FC<{ mapping: MitreMapping }> = ({ mapping }) =
     </div>
 );
 
-const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
+const DetailView: React.FC<DetailViewProps> = ({ item, onReturn, themeStyles }) => {
 
     const renderItemDetails = () => {
         if ('severity' in item && 'raw_data' in item) { // It's an Alert

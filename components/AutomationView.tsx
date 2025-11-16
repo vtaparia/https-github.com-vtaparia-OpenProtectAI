@@ -12,6 +12,8 @@ interface AutomationViewProps {
     setPlaybooks: React.Dispatch<React.SetStateAction<Playbook[]>>;
     uniqueAlertTitles: string[];
     uniqueMitreIds: string[];
+    // FIX: Added themeStyles to props to match what is passed from App.tsx.
+    themeStyles: Record<string, string>;
 }
 
 const PlaybookEditorModal: React.FC<{
@@ -205,7 +207,7 @@ const PlaybookEditorModal: React.FC<{
     );
 };
 
-const AutomationView: React.FC<AutomationViewProps> = ({ playbooks, setPlaybooks, uniqueAlertTitles, uniqueMitreIds }) => {
+const AutomationView: React.FC<AutomationViewProps> = ({ playbooks, setPlaybooks, uniqueAlertTitles, uniqueMitreIds, themeStyles }) => {
     const [isEditorOpen, setIsEditorOpen] = useState(false);
     const [editingPlaybook, setEditingPlaybook] = useState<Playbook | undefined>(undefined);
     const [historyPlaybook, setHistoryPlaybook] = useState<Playbook | undefined>(undefined);

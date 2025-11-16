@@ -8,6 +8,8 @@ import { MitreAttackIcon } from './icons/NavIcons';
 interface MitreAttackViewProps {
     alerts: Alert[];
     playbooks: Playbook[];
+    // FIX: Added themeStyles to props to match what is passed from App.tsx.
+    themeStyles: Record<string, string>;
 }
 
 interface Technique {
@@ -42,7 +44,7 @@ const TechniqueCell: React.FC<{
     );
 };
 
-const MitreAttackView: React.FC<MitreAttackViewProps> = ({ alerts, playbooks }) => {
+const MitreAttackView: React.FC<MitreAttackViewProps> = ({ alerts, playbooks, themeStyles }) => {
     
     const coverageData = useMemo(() => {
         const detectedTechniques = new Set<string>();

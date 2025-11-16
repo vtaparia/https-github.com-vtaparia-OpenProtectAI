@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import ResponseDisplay from './ResponseDisplay';
 import PromptInput from './PromptInput';
@@ -9,9 +10,11 @@ interface ChatPanelProps {
     chatHistory: ChatMessage[];
     isLoading: boolean;
     onSend: (prompt: string) => void;
+    // FIX: Added themeStyles to props to match what is passed from App.tsx.
+    themeStyles: Record<string, string>;
 }
 
-const ChatPanel: React.FC<ChatPanelProps> = ({ chatHistory, isLoading, onSend }) => {
+const ChatPanel: React.FC<ChatPanelProps> = ({ chatHistory, isLoading, onSend, themeStyles }) => {
     const [isExpanded, setIsExpanded] = useState(true);
 
     return (

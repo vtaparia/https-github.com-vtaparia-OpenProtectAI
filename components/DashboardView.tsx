@@ -20,6 +20,7 @@ interface DashboardViewProps {
   onDeployClick: () => void;
   onSettingsClick: () => void;
   onKnowledgeMeterClick: () => void;
+  themeStyles: Record<string, string>;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -31,6 +32,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   onDeployClick,
   onSettingsClick,
   onKnowledgeMeterClick,
+  themeStyles,
 }) => {
   const caseCounts = {
     [CaseStatus.NEW]: 0,
@@ -40,13 +42,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   cases.forEach(c => caseCounts[c.status]++);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-800/50 backdrop-blur-lg border border-slate-700/50 rounded-lg p-4">
+    <div className={`flex-1 overflow-y-auto rounded-lg ${themeStyles.p} ${themeStyles.bgSecondaryBackdrop} ${themeStyles.border}`}>
         <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-100">Intelligence Dashboard</h2>
+            <h2 className={`text-xl font-bold ${themeStyles.textHeading}`}>Intelligence Dashboard</h2>
             <div className="flex items-center gap-2">
                  <button 
                     onClick={onSettingsClick}
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-semibold bg-slate-600 hover:bg-slate-500 rounded-md transition-colors"
+                    className={`flex items-center gap-2 text-sm font-semibold rounded-md transition-colors ${themeStyles.buttonSecondary} ${themeStyles.pxy_sm}`}
                     title="Configure Agent Settings"
                 >
                     <SettingsIcon />
@@ -54,7 +56,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                 </button>
                 <button 
                     onClick={onDeployClick}
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-semibold bg-cyan-600 hover:bg-cyan-500 rounded-md transition-colors shadow-lg shadow-cyan-600/20"
+                    className={`flex items-center gap-2 text-sm font-semibold rounded-md transition-colors shadow-lg ${themeStyles.buttonPrimary} ${themeStyles.pxy_sm}`}
                     title="Deploy New Agent"
                 >
                     <DeployIcon />
@@ -62,45 +64,45 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                 </button>
             </div>
         </div>
-        <div className="space-y-4">
+        <div className={themeStyles.gap}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                    <ServerKnowledgeMeter level={serverKnowledgeLevel} onClick={onKnowledgeMeterClick} />
+                <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
+                    <ServerKnowledgeMeter level={serverKnowledgeLevel} onClick={onKnowledgeMeterClick} themeStyles={themeStyles} />
                 </div>
-                <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                    <AgentKnowledgeMeter level={agentKnowledgeLevel} />
+                <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
+                    <AgentKnowledgeMeter level={agentKnowledgeLevel} themeStyles={themeStyles} />
                 </div>
-                <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                    <h3 className="text-base font-bold text-gray-300 mb-3 flex items-center gap-2">
+                <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
+                    <h3 className={`text-base font-bold mb-3 flex items-center gap-2 ${themeStyles.textSecondary}`}>
                         <CaseIcon />
                         Open Cases Summary
                     </h3>
                     <div className="flex justify-around items-center h-full">
                         <div className="text-center">
                             <p className="text-3xl font-bold text-red-400">{caseCounts[CaseStatus.NEW]}</p>
-                            <p className="text-xs text-gray-400">New / Unassigned</p>
+                            <p className={`text-xs ${themeStyles.textSecondary}`}>New / Unassigned</p>
                         </div>
                         <div className="text-center">
                             <p className="text-3xl font-bold text-yellow-400">{caseCounts[CaseStatus.IN_PROGRESS]}</p>
-                            <p className="text-xs text-gray-400">In Progress</p>
+                            <p className={`text-xs ${themeStyles.textSecondary}`}>In Progress</p>
                         </div>
                          <div className="text-center">
                             <p className="text-3xl font-bold text-green-400">{caseCounts[CaseStatus.RESOLVED]}</p>
-                            <p className="text-xs text-gray-400">Resolved</p>
+                            <p className={`text-xs ${themeStyles.textSecondary}`}>Resolved</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                 <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                    <h3 className="text-base font-bold text-gray-300 mb-3 flex items-center gap-2">
+                 <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
+                    <h3 className={`text-base font-bold mb-3 flex items-center gap-2 ${themeStyles.textSecondary}`}>
                         <GlobeIcon />
                         Threat Landscape Overview
                     </h3>
                     <ThreatHeatmap events={serverEvents} />
                 </div>
-                 <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                    <CorrelationActivityGraph activityData={correlationActivity} />
+                 <div className={`p-4 rounded-lg ${themeStyles.bgPanel} ${themeStyles.border}`}>
+                    <CorrelationActivityGraph activityData={correlationActivity} themeStyles={themeStyles} />
                 </div>
             </div>
         </div>
