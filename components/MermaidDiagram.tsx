@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 // @ts-ignore
 import mermaid from 'mermaid';
@@ -18,6 +19,10 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart }) => {
     if (containerRef.current) {
         const renderDiagram = async () => {
             try {
+                // Initialize mermaid if it hasn't been already
+                if (typeof mermaid.initialize === 'function') {
+                    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+                }
                 const { svg } = await mermaid.render(diagramId, chart);
                 if(containerRef.current) {
                     containerRef.current.innerHTML = svg;

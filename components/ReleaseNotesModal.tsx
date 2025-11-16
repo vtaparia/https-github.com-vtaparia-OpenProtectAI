@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 interface ReleaseNotesModalProps {
@@ -28,47 +29,36 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.7.0</h2>
+          <h2 className="text-xl font-bold">What's New in v1.9.0</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">SOC Workflow Enhancements</h3>
+            <h3 className="text-lg font-bold text-gray-100">Automation & Orchestration</h3>
             
-            <Feature title="New! Case Assignment Workflow">
-                To enhance the incident response lifecycle, newly created cases can now be assigned to specific security analysts from a dropdown. Assigning a case automatically transitions its status to "In Progress" and updates the main dashboard, providing a complete workflow for incident management.
+            <Feature title="New! SOAR Playbook Automation">
+                A new "Automation" view has been added to the console. This provides a user-friendly interface to create and manage simple, trigger-based automation rules (playbooks) to orchestrate security responses (e.g., auto-create and assign cases).
+            </Feature>
+
+            <Feature title="Playbook Engine & Auditing">
+                The server's core logic now includes a playbook engine that runs incoming alerts against active playbooks. When a playbook is triggered, a new "Playbook Triggered" event is logged in the Server Intelligence feed for a complete audit trail.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
+
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.8.1 - Extensibility & Configuration</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                 <Feature title="Multi-LLM Integration Framework">
+                    The AI service is now a modular framework, making it easy for developers to switch between different LLM backends (e.g., Google Gemini, Groq, or a local Ollama instance) by securely changing server-side configuration.
+                </Feature>
+            </div>
             
-             <h4 className="text-md font-semibold text-gray-300 mt-2">v1.6.1 - Intelligence Enhancements</h4>
+            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.8.0 - Incident Lifecycle Management</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="New Intel Source: Grok AI Analysis">
-                    The server can now simulate leveraging a powerful Large Language Model (like Grok) to analyze complex, uncategorized threat data and generate actionable summaries.
-                </Feature>
-            </div>
-
-            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.6.0 - Incident Review & Auditing</h4>
-            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="Incident Review View">
-                    A new "Incident Review" section allows SOC managers to view, search, and audit all resolved cases, providing a complete historical record of past incidents.
-                </Feature>
-            </div>
-
-            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.5.0 - SOC Workflow &amp; Case Assignment</h4>
-            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="Case Assignment Workflow">
-                    To enhance the incident response lifecycle, cases can now be assigned to specific security analysts, automatically transitioning them to an "In Progress" state.
-                </Feature>
-            </div>
-
-
-            <h4 className="text-md font-semibold text-gray-300 mt-4">v1.4.0 - Incident Response &amp; Case Management</h4>
-            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="Case Management System">
-                    Analysts can create an investigation "Case" from any high or critical severity alert, assigning a unique Case ID for tracking.
+                <Feature title="Case Resolution Workflow">
+                    The incident response lifecycle is now complete. Analysts can resolve "In Progress" cases by adding mandatory resolution notes, which closes out the investigation and moves the case to the Incident Review audit trail.
                 </Feature>
             </div>
         </main>

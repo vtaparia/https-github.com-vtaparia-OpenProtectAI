@@ -1,8 +1,9 @@
 
-import React from 'react';
-import { DashboardIcon, AgentIcon, ServerIcon, IncidentReviewIcon } from './icons/NavIcons';
 
-export type View = 'Dashboard' | 'Agent Fleet' | 'Server Intelligence' | 'Incident Review';
+import React from 'react';
+import { DashboardIcon, AgentIcon, ServerIcon, IncidentReviewIcon, AutomationIcon } from './icons/NavIcons';
+
+export type View = 'Dashboard' | 'Agent Fleet' | 'Server Intelligence' | 'Incident Review' | 'Automation';
 
 interface NavigationSidebarProps {
   activeView: View;
@@ -52,6 +53,13 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
             label="Incident Review"
             isActive={activeView === 'Incident Review'}
             onClick={() => onViewChange('Incident Review')}
+        />
+        <div className="border-t border-slate-700/50 my-2"></div>
+        <NavItem 
+            icon={<AutomationIcon />}
+            label="Automation"
+            isActive={activeView === 'Automation'}
+            onClick={() => onViewChange('Automation')}
         />
     </nav>
   );

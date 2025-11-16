@@ -55,92 +55,27 @@ IMPORTANT RULES:
 • Use Markdown for formatting and Mermaid for diagrams.
 `;
 
-/**
- * =================================================================================
- * Option 1: Integration with a self-hosted Open-Source LLM via Ollama
- * =================================================================================
- * This implementation uses the standard `fetch` API to communicate with a local
- * Ollama server. It's a great way to use models like Gemma, Llama, etc., for free.
- * 
- * To use this:
- * 1. Install Ollama: https://ollama.com/
- * 2. Run a model in your terminal: `ollama run gemma:2b`
- * 3. The application will now work with your local LLM.
- */
-/*
-export async function* getChatResponse(prompt: string): AsyncGenerator<{ text: () => string; }> {
-    if (typeof prompt !== 'string' || !prompt.trim()) {
-        throw new Error('Invalid prompt provided.');
-    }
+// =================================================================================
+// Multi-LLM Integration Framework
+// =================================================================================
+// This file is designed to be modular. You can switch the AI backend by
+// commenting out the active implementation and activating your desired one.
+// API keys should be managed via environment variables on the server.
+// ---------------------------------------------------------------------------------
 
-    try {
-        const response = await fetch('http://localhost:11434/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: 'gemma:2b', // Or whatever model you are running
-                messages: [
-                    { role: 'system', content: SYSTEM_INSTRUCTION },
-                    { role: 'user', content: prompt }
-                ],
-                stream: true,
-            }),
-        });
-
-        if (!response.body) {
-            throw new Error('Response body is null.');
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-                break;
-            }
-            const chunk = decoder.decode(value);
-            // Ollama streams NDJSON, so we parse each line
-            const lines = chunk.split('\n').filter(line => line.trim() !== '');
-            for (const line of lines) {
-                const parsed = JSON.parse(line);
-                if (parsed.message && parsed.message.content) {
-                    // Yield an object that matches the expected Gemini chunk format
-                    yield { text: () => parsed.message.content };
-                }
-                 if (parsed.error) {
-                    throw new Error(`Ollama API Error: ${parsed.error}`);
-                }
-            }
-        }
-
-    } catch (error) {
-        console.error("Ollama API Error:", error);
-        throw new Error("Failed to get response from local LLM. Is Ollama running with a model (e.g., `ollama run gemma:2b`)?");
-    }
-}
-*/
+type AIProvider = 'Google Gemini' | 'Groq' | 'Ollama';
+const ACTIVE_PROVIDER: AIProvider = 'Google Gemini';
 
 
-/**
- * =================================================================================
- * Option 2: Original Gemini API integration
- * =================================================================================
- * This is the original code that communicates with the Google Gemini API.
- * To use this, rename this function to `getChatResponse` and the function above
- * to something else (e.g., `getChatResponseOllama`).
- * 
- * You will also need to have the `API_KEY` environment variable set.
- */
-// FIX: Switched from Ollama to Gemini API by activating this implementation.
+// =================================================================================
+// === OPTION 1: Google Gemini (Active by Default) =================================
+// =================================================================================
 let chat: Chat | null = null;
 
 function getChatInstance(): Chat {
   if (!chat) {
     if (!process.env.API_KEY) {
-      throw new Error("API_KEY environment variable not set.");
+      throw new Error("API_KEY environment variable not set for Gemini.");
     }
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     chat = ai.chats.create({
@@ -153,16 +88,142 @@ function getChatInstance(): Chat {
   return chat;
 }
 
+async function getChatResponse_Gemini(prompt: string) {
+  const chatInstance = getChatInstance();
+  // FIX: The `sendMessageStream` method on a Chat object expects the prompt string directly,
+  // not an object with a `message` property. The provided documentation example appears to be incorrect.
+  const result = await chatInstance.sendMessageStream(prompt);
+  return result;
+}
+
+
+// =================================================================================
+// === OPTION 2: Groq (High-Speed Inference) =======================================
+// =================================================================================
+/*
+async function* getChatResponse_Groq(prompt: string): AsyncGenerator<{ text: string; }> {
+    // IMPORTANT: In a real app, get this from process.env.GROQ_API_KEY
+    const GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE";
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            model: 'gemma-7b-it', // Example model on Groq
+            messages: [
+                { role: 'system', content: SYSTEM_INSTRUCTION },
+                { role: 'user', content: prompt }
+            ],
+            stream: true,
+        }),
+    });
+
+    if (!response.body) throw new Error('Response body is null.');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                const data = line.substring(6);
+                if (data.trim() === '[DONE]') break;
+                try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed.choices[0]?.delta?.content;
+                    if (content) {
+                        yield { text: content };
+                    }
+                } catch (e) {
+                    // Ignore parsing errors for incomplete JSON chunks
+                }
+            }
+        }
+    }
+}
+*/
+
+// =================================================================================
+// === OPTION 3: Ollama (Self-Hosted Open-Source) ==================================
+// =================================================================================
+/*
+async function* getChatResponse_Ollama(prompt: string): AsyncGenerator<{ text: string; }> {
+    const response = await fetch('http://localhost:11434/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'gemma:2b', // Or whatever model you are running
+            messages: [
+                { role: 'system', content: SYSTEM_INSTRUCTION },
+                { role: 'user', content: prompt }
+            ],
+            stream: true,
+        }),
+    });
+
+    if (!response.body) throw new Error('Response body is null.');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim() !== '');
+        for (const line of lines) {
+            const parsed = JSON.parse(line);
+            if (parsed.message?.content) {
+                yield { text: parsed.message.content };
+            }
+            if (parsed.error) throw new Error(`Ollama API Error: ${parsed.error}`);
+        }
+    }
+}
+*/
+
+// =================================================================================
+// === Unified Export & Control Functions ========================================
+// =================================================================================
+
 export async function getChatResponse(prompt: string) {
   if (typeof prompt !== 'string' || !prompt.trim()) {
     throw new Error('Invalid prompt provided to getChatResponse.');
   }
+
   try {
-    const chatInstance = getChatInstance();
-    const result = await chatInstance.sendMessageStream({ message: prompt });
-    return result;
+    switch (ACTIVE_PROVIDER) {
+      case 'Google Gemini':
+        return await getChatResponse_Gemini(prompt);
+      // case 'Groq':
+      //   return getChatResponse_Groq(prompt);
+      // case 'Ollama':
+      //   return getChatResponse_Ollama(prompt);
+      default:
+        throw new Error(`Unsupported AI provider: ${ACTIVE_PROVIDER}`);
+    }
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error("Failed to get response from AI. Please check your API key and network connection.");
+    console.error(`${ACTIVE_PROVIDER} API Error:`, error);
+    throw new Error(`Failed to get response from ${ACTIVE_PROVIDER}. Please check your configuration and network connection.`);
   }
+}
+
+/**
+ * Resets the chat instance, allowing the app to pick up a new API key from the environment.
+ */
+export function reinitializeChat() {
+  chat = null;
+  console.log("AI connection re-initialized. It will use the updated API key on the next request.");
+}
+
+/**
+ * Returns the name of the currently active AI provider.
+ */
+export function getActiveProvider(): AIProvider {
+    return ACTIVE_PROVIDER;
 }

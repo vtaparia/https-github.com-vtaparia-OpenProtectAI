@@ -1,7 +1,8 @@
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case } from './types';
-import { getChatResponse } from './services/geminiService';
+import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, AgentUpgradeDirective, CaseStatus, Case, Playbook } from './types';
+import { getChatResponse, reinitializeChat, getActiveProvider } from './services/geminiService';
 import Header from './components/Header';
 import { sha256 } from './utils/hashing';
 import DashboardView from './components/DashboardView';
@@ -18,6 +19,7 @@ import AgentUpgradeModal from './components/AgentUpgradeModal';
 import AssignCaseModal from './components/AssignCaseModal';
 import ResolveCaseModal from './components/ResolveCaseModal';
 import IncidentReviewView from './components/IncidentReviewView';
+import AutomationView from './components/AutomationView';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -133,6 +135,20 @@ const vulnerabilityIntelSources: LearningUpdate[] = [
     },
 ];
 
+const initialPlaybooks: Playbook[] = [
+    {
+        id: 'playbook-1',
+        name: 'Auto-Triage Credential Dumping on Servers',
+        description: 'Automatically creates and assigns a case for any credential dumping attempt on a Windows server.',
+        is_active: true,
+        trigger: { field: 'title', operator: 'is', value: 'Potential Credential Dumping' },
+        actions: [
+            { type: 'CREATE_CASE' },
+            { type: 'ASSIGN_CASE', params: { assignee: 'Tier 2 SOC' } },
+        ],
+    },
+];
+
 const App: React.FC = () => {
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -141,6 +157,7 @@ const App: React.FC = () => {
     const [cases, setCases] = useState<Map<string, Case>>(() => new Map());
     const [assignModalInfo, setAssignModalInfo] = useState<{ isOpen: boolean; caseId: string | null }>({ isOpen: false, caseId: null });
     const [resolveModalInfo, setResolveModalInfo] = useState<{ isOpen: boolean; caseId: string | null }>({ isOpen: false, caseId: null });
+    const [playbooks, setPlaybooks] = useState<Playbook[]>(initialPlaybooks);
     const [knowledgeLevel, setKnowledgeLevel] = useState(10);
     const [agentKnowledgeLevel, setAgentKnowledgeLevel] = useState(5);
     const [isDeploymentModalOpen, setDeploymentModalOpen] = useState(false);
@@ -166,10 +183,78 @@ const App: React.FC = () => {
                 points,
                 newTotal,
             };
-            setLearningLog(prevLog => [newEntry, ...prevLog].slice(0, 100)); // Keep last 100 entries
+            setLearningLog(prevLog => [newEntry, ...prevLog].slice(0, 100));
             return newTotal;
         });
-    }, [setKnowledgeLevel, setLearningLog]);
+    }, []);
+
+    const handleCreateCase = useCallback((alertToCase: Alert): string => {
+        const caseId = `CASE-${String(Date.now()).slice(-6)}`;
+        setAlerts(prevAlerts => 
+            prevAlerts.map(alert => 
+                alert.id === alertToCase.id ? { ...alert, caseId } : alert
+            )
+        );
+        setCases(prevCases => {
+            const newCases = new Map(prevCases);
+            newCases.set(caseId, { status: CaseStatus.NEW, alerts: [alertToCase] });
+            return newCases;
+        });
+        return caseId;
+    }, []);
+    
+    const handleAssignCase = useCallback((caseId: string, assignee: string) => {
+        setCases(prevCases => {
+            const newCases = new Map(prevCases);
+            const existingCase = newCases.get(caseId);
+            if (existingCase) {
+                newCases.set(caseId, { 
+                    ...existingCase, 
+                    assignee, 
+                    status: CaseStatus.IN_PROGRESS 
+                });
+            }
+            return newCases;
+        });
+        setAssignModalInfo({ isOpen: false, caseId: null });
+    }, []);
+
+    const executePlaybook = useCallback((playbook: Playbook, alert: Alert) => {
+        let caseId: string | null = null;
+        const actionsTaken: string[] = [];
+
+        playbook.actions.forEach(action => {
+            switch (action.type) {
+                case 'CREATE_CASE':
+                    caseId = handleCreateCase(alert);
+                    actionsTaken.push('Case Created');
+                    break;
+                case 'ASSIGN_CASE':
+                    if (caseId && action.params?.assignee) {
+                        handleAssignCase(caseId, action.params.assignee);
+                        actionsTaken.push(`Case Assigned to ${action.params.assignee}`);
+                    }
+                    break;
+                // Add more actions here in the future
+            }
+        });
+
+        const playbookEvent: ServerEvent = {
+            id: `se-${Date.now()}-playbook`,
+            type: 'PLAYBOOK_TRIGGERED',
+            timestamp: new Date().toISOString(),
+            payload: {
+                playbook_name: playbook.name,
+                triggered_by_alert_title: alert.title,
+                target_host: alert.raw_data?.device.hostname || 'Unknown',
+                actions_taken: actionsTaken,
+            },
+        };
+        setServerEvents(prev => [...prev, playbookEvent]);
+        logKnowledgeContribution(`Playbook: ${playbook.name}`, 0.5);
+
+    }, [handleCreateCase, handleAssignCase, logKnowledgeContribution]);
+
 
     const processAlert = useCallback(async (alert: Alert) => {
         const sanitized_data: Record<string, any> = {};
@@ -234,7 +319,7 @@ const App: React.FC = () => {
             });
         }
         
-        if (alert.severity === AlertSeverity.CRITICAL) {
+        if (alert.severity === AlertSeverity.CRITICAL && !playbooks.some(p => p.trigger.value === alert.title && p.is_active)) {
              const remediationEvent: ServerEvent = {
                 id: `se-${Date.now()}-remediate`,
                 type: 'AUTOMATED_REMEDIATION',
@@ -249,10 +334,25 @@ const App: React.FC = () => {
             logKnowledgeContribution(`Remediation for: ${alert.title}`, 0.5);
             activitySpike += 10;
         }
+        
+        // --- Playbook Engine ---
+        playbooks.forEach(playbook => {
+            if (playbook.is_active) {
+                const { field, operator, value } = playbook.trigger;
+                let isMatch = false;
+                if (field === 'title' && operator === 'is' && alert.title === value) {
+                    isMatch = true;
+                }
+                // Add more complex trigger logic here in the future
+                if (isMatch) {
+                    executePlaybook(playbook, alert);
+                }
+            }
+        });
 
         setCorrelationActivity(prev => [...prev.slice(1), activitySpike]);
 
-    }, [logKnowledgeContribution]);
+    }, [logKnowledgeContribution, playbooks, executePlaybook]);
 
     const pushKnowledgeSync = useCallback(() => {
         const syncEvent: ServerEvent = {
@@ -346,7 +446,6 @@ const App: React.FC = () => {
             setChatHistory(prev => [...prev, { role: MessageRole.MODEL, content: '' }]);
 
             for await (const chunk of stream) {
-                // Per Gemini API guidelines, the `text` property on a streaming `GenerateContentResponse` chunk is a string property.
                 modelResponse += chunk.text;
                 setChatHistory(prev => {
                     const newHistory = [...prev];
@@ -366,13 +465,12 @@ const App: React.FC = () => {
 
     const handleViewChange = (view: NavigationView) => {
         setActiveView(view);
-        setSelectedDetailItem(null); // Clear detail view when changing main view
+        setSelectedDetailItem(null);
     }
 
     const handleSelectItem = (item: AllEventTypes) => {
-        // For server events, we want a full-screen detail view
         if ('type' in item) {
-             setActiveView('Server Intelligence'); // Switch view for context
+             setActiveView('Server Intelligence');
              setSelectedDetailItem(item);
         }
     }
@@ -387,36 +485,6 @@ const App: React.FC = () => {
         };
         setServerEvents(prev => [...prev, pushEvent]);
         setUpgradeModalOpen(false);
-    };
-
-    const handleCreateCase = (alertToCase: Alert) => {
-        const caseId = `CASE-${String(Date.now()).slice(-6)}`;
-        setAlerts(prevAlerts => 
-            prevAlerts.map(alert => 
-                alert.id === alertToCase.id ? { ...alert, caseId } : alert
-            )
-        );
-        setCases(prevCases => {
-            const newCases = new Map(prevCases);
-            newCases.set(caseId, { status: CaseStatus.NEW, alerts: [alertToCase] });
-            return newCases;
-        });
-    };
-    
-    const handleAssignCase = (caseId: string, assignee: string) => {
-        setCases(prevCases => {
-            const newCases = new Map(prevCases);
-            const existingCase = newCases.get(caseId);
-            if (existingCase) {
-                newCases.set(caseId, { 
-                    ...existingCase, 
-                    assignee, 
-                    status: CaseStatus.IN_PROGRESS 
-                });
-            }
-            return newCases;
-        });
-        setAssignModalInfo({ isOpen: false, caseId: null });
     };
 
     const handleResolveCase = (caseId: string, notes: string) => {
@@ -465,6 +533,8 @@ const App: React.FC = () => {
                  return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} />;
             case 'Incident Review':
                  return <IncidentReviewView cases={cases} />;
+            case 'Automation':
+                return <AutomationView playbooks={playbooks} setPlaybooks={setPlaybooks} uniqueAlertTitles={Array.from(new Set(sampleAlerts.map(a => a.title)))} />;
             default:
                 return null;
         }
@@ -492,7 +562,12 @@ const App: React.FC = () => {
                 onSend={handleSend}
              />
             <DeploymentModal isOpen={isDeploymentModalOpen} onClose={() => setDeploymentModalOpen(false)} />
-            <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+            <SettingsModal 
+                isOpen={isSettingsModalOpen} 
+                onClose={() => setSettingsModalOpen(false)}
+                activeProvider={getActiveProvider()}
+                onReinitialize={reinitializeChat}
+            />
             <LearningAnalyticsModal isOpen={isAnalyticsModalOpen} onClose={() => setAnalyticsModalOpen(false)} log={learningLog} />
             <ReleaseNotesModal isOpen={isReleaseNotesModalOpen} onClose={() => setReleaseNotesModalOpen(false)} />
             <AgentUpgradeModal 

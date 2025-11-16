@@ -1,6 +1,7 @@
 
+
 import React from 'react';
-import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation } from '../types';
+import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation, PlaybookTriggered } from '../types';
 import PayloadDetailsView from './PayloadDetailsView';
 
 interface DetailViewProps {
@@ -85,6 +86,19 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                              <p className="text-sm text-gray-400 mb-4">Immediate response to critical threat: {payload.threat_name}</p>
                              <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
                                 <h4 className="text-sm font-semibold text-gray-400 mb-2">Remediation Details</h4>
+                                <PayloadDetailsView payload={payload} />
+                             </div>
+                        </div>
+                    );
+                }
+                case 'PLAYBOOK_TRIGGERED': {
+                    const payload = event.payload as PlaybookTriggered;
+                     return (
+                        <div>
+                             <h3 className="text-lg font-bold text-violet-400 mb-2">SOAR Playbook Triggered</h3>
+                             <p className="text-sm text-gray-400 mb-4">Playbook "{payload.playbook_name}" was executed in response to an alert.</p>
+                             <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                <h4 className="text-sm font-semibold text-gray-400 mb-2">Execution Details</h4>
                                 <PayloadDetailsView payload={payload} />
                              </div>
                         </div>

@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 const ShieldIcon: React.FC = () => (
@@ -23,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ onVersionClick }) => {
             </div>
         </div>
         <button onClick={onVersionClick} className="text-xs font-mono bg-slate-700/50 text-cyan-400 px-2 py-1 rounded-md hover:bg-slate-700 transition-colors">
-            v1.7.0
+            v1.9.0
         </button>
     </header>
   );

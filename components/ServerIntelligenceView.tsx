@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { ServerEvent, AllEventTypes } from '../types';
 import LWServerEventItem from './LWServerEventItem';
@@ -7,6 +8,7 @@ import DirectivePushItem from './DirectivePushItem';
 import KnowledgeSyncItem from './KnowledgeSyncItem';
 import ProactiveAlertItem from './ProactiveAlertItem';
 import AutomatedRemediationItem from './AutomatedRemediationItem';
+import PlaybookTriggeredItem from './PlaybookTriggeredItem';
 
 interface ServerIntelligenceViewProps {
   events: ServerEvent[];
@@ -44,6 +46,8 @@ const ServerIntelligenceView: React.FC<ServerIntelligenceViewProps> = ({ events,
                     return <ProactiveAlertItem key={event.id} event={event} onSelectItem={onSelectItem}/>;
                 case 'AUTOMATED_REMEDIATION':
                     return <AutomatedRemediationItem key={event.id} event={event} onSelectItem={onSelectItem}/>;
+                case 'PLAYBOOK_TRIGGERED':
+                    return <PlaybookTriggeredItem key={event.id} event={event} onSelectItem={onSelectItem} />;
                 default:
                     return null;
             }
