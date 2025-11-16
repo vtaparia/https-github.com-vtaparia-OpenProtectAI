@@ -61,12 +61,16 @@ const LearningAnalyticsModal: React.FC<LearningAnalyticsModalProps> = ({ isOpen,
             <div className="md:w-1/3 flex flex-col space-y-4">
                 <h3 className="text-lg font-semibold text-gray-100 border-b border-slate-700 pb-2">Contribution Summary</h3>
                 <div className="space-y-3 text-sm">
-                    {Object.entries(summary).map(([source, data]) => (
-                        <div key={source} className="flex justify-between items-baseline">
-                            <span className="text-gray-400">{source} ({data.count} events):</span>
-                            <span className="font-bold text-cyan-400">+{data.points.toFixed(2)} pts</span>
-                        </div>
-                    ))}
+                    {Object.entries(summary).map(([source, data]) => {
+                        // FIX: Add type assertion for `data` to resolve properties 'count' and 'points' on type 'unknown'.
+                        const summaryData = data as { count: number, points: number };
+                        return (
+                            <div key={source} className="flex justify-between items-baseline">
+                                <span className="text-gray-400">{source} ({summaryData.count} events):</span>
+                                <span className="font-bold text-cyan-400">+{summaryData.points.toFixed(2)} pts</span>
+                            </div>
+                        )
+                    })}
                 </div>
                  <div className="border-t border-slate-700 pt-3 text-sm flex justify-between items-baseline">
                     <span className="font-semibold text-gray-300">Current Knowledge Level:</span>

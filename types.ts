@@ -84,13 +84,22 @@ export interface PlaybookAction {
     };
 }
 
+export interface PlaybookVersion {
+    versionId: string;
+    createdAt: string;
+    author: string;
+    notes: string;
+    trigger: PlaybookTrigger;
+    actions: PlaybookAction[];
+}
+
 export interface Playbook {
     id: string;
     name: string;
     description: string;
     is_active: boolean;
-    trigger: PlaybookTrigger;
-    actions: PlaybookAction[];
+    versions: PlaybookVersion[];
+    activeVersionId: string;
 }
 
 export interface PlaybookTriggered {

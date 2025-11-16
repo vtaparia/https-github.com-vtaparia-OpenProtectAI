@@ -1,7 +1,8 @@
 
 
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective } from './types';
+import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective, PlaybookVersion } from './types';
 import { getChatResponse, reinitializeChat, getActiveProvider } from './services/geminiService';
 import Header from './components/Header';
 import { sha256 } from './utils/hashing';
@@ -145,11 +146,20 @@ const initialPlaybooks: Playbook[] = [
         name: 'Auto-Triage Credential Dumping on Servers',
         description: 'Automatically creates and assigns a case for any credential dumping attempt on a Windows server.',
         is_active: true,
-        trigger: { field: 'mitre_mapping.id', operator: 'is', value: 'T1003.001' },
-        actions: [
-            { type: 'CREATE_CASE' },
-            { type: 'ASSIGN_CASE', params: { assignee: 'Tier 2 SOC' } },
-        ],
+        activeVersionId: 'pv-1-initial',
+        versions: [
+            {
+                versionId: 'pv-1-initial',
+                createdAt: new Date().toISOString(),
+                author: 'System',
+                notes: 'Initial playbook creation.',
+                trigger: { field: 'mitre_mapping.id', operator: 'is', value: 'T1003.001' },
+                actions: [
+                    { type: 'CREATE_CASE' },
+                    { type: 'ASSIGN_CASE', params: { assignee: 'Tier 2 SOC' } },
+                ],
+            }
+        ]
     },
 ];
 
@@ -228,10 +238,13 @@ const App: React.FC = () => {
     }, [setCases]);
 
     const executePlaybook = useCallback((playbook: Playbook, alert: Alert) => {
+        const activeVersion = playbook.versions.find(v => v.versionId === playbook.activeVersionId);
+        if (!activeVersion) return;
+
         let caseId: string | null = null;
         const actionsTaken: string[] = [];
 
-        playbook.actions.forEach(action => {
+        activeVersion.actions.forEach(action => {
             switch (action.type) {
                 case 'CREATE_CASE':
                     caseId = handleCreateCase(alert);
@@ -347,7 +360,24 @@ const App: React.FC = () => {
             });
         }
         
-        if (alert.severity === AlertSeverity.CRITICAL && !playbooks.some(p => p.trigger.value === alert.title && p.is_active)) {
+        // FIX: Correctly check if a playbook handles the alert by accessing the trigger from the active version, resolving a type error.
+        const isHandledByPlaybook = playbooks.some(playbook => {
+            if (!playbook.is_active) return false;
+            
+            const activeVersion = playbook.versions.find(v => v.versionId === playbook.activeVersionId);
+            if (!activeVersion) return false;
+
+            const { field, operator, value } = activeVersion.trigger;
+            if (field === 'title' && operator === 'is' && alert.title === value) {
+                return true;
+            }
+            if (field === 'mitre_mapping.id' && operator === 'is' && alert.mitre_mapping?.id === value) {
+                return true;
+            }
+            return false;
+        });
+
+        if (alert.severity === AlertSeverity.CRITICAL && !isHandledByPlaybook) {
              const remediationEvent: ServerEvent = {
                 id: `se-${Date.now()}-remediate`,
                 type: 'AUTOMATED_REMEDIATION',
@@ -366,7 +396,10 @@ const App: React.FC = () => {
         // --- Playbook Engine ---
         playbooks.forEach(playbook => {
             if (playbook.is_active) {
-                const { field, operator, value } = playbook.trigger;
+                const activeVersion = playbook.versions.find(v => v.versionId === playbook.activeVersionId);
+                if (!activeVersion) return;
+
+                const { field, operator, value } = activeVersion.trigger;
                 let isMatch = false;
                 if (field === 'title' && operator === 'is' && alert.title === value) {
                     isMatch = true;
@@ -431,7 +464,9 @@ const App: React.FC = () => {
             }
 
             Object.entries(contextualThreatTracker).forEach(([key, data]) => {
-                if (data.count > 1) { 
+                // FIX: Cast `data` to its expected type to resolve 'unknown' property access errors.
+                const threatData = data as { count: number; titles: Set<string> };
+                if (threatData.count > 1) { 
                     const [industry, region] = key.split('|');
                      const proactiveAlert: ServerEvent = {
                         id: `se-${now.getTime()}-proactive`,
@@ -439,7 +474,7 @@ const App: React.FC = () => {
                         timestamp: new Date().toISOString(),
                         payload: {
                             title: `Heightened Threat Activity Detected`,
-                            threat_summary: `Correlated multiple threats targeting the ${industry} industry in ${region}. Threats include: ${Array.from(data.titles).join(', ')}.`,
+                            threat_summary: `Correlated multiple threats targeting the ${industry} industry in ${region}. Threats include: ${Array.from(threatData.titles).join(', ')}.`,
                             target_context: `${industry} Sector in ${region}`
                         } as ProactiveAlertPush
                     };
