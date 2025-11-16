@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 interface ReleaseNotesModalProps {
@@ -28,24 +29,40 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.9.2</h2>
+          <h2 className="text-xl font-bold">What's New in v1.9.4</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">SOAR Playbook Version Control</h3>
+            <h3 className="text-lg font-bold text-gray-100">Documentation & Clarity Update</h3>
             
-            <Feature title="New! Playbook Versioning">
-                Playbooks now have a full version history. Editing a playbook creates a new, timestamped version with change notes instead of overwriting, preserving all previous configurations for audit and rollback.
-            </Feature>
-
-            <Feature title="History & Rollback UI">
-                A new "History" button on each playbook opens a modal to view all previous versions. From this view, you can see change notes and instantly revert to any older version by setting it as active.
+            <Feature title="Enhanced Agent Description">
+                The README has been updated with a detailed description of the simulated agent's real-time monitoring capabilities, including process collection, anomaly detection, and local analysis.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
+
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.3 - MITRE ATT&CK® Framework Integration</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                <Feature title="New! MITRE ATT&CK Coverage View">
+                    A new "MITRE ATT&CK" view has been added, providing a strategic matrix of adversary tactics and techniques. This view visualizes your security posture, highlighting detected threats and where you have automated playbook coverage.
+                </Feature>
+                <Feature title="Interactive Threat Matrix">
+                    The matrix cells are color-coded to indicate status: blue for detected techniques and purple for techniques covered by an active SOAR playbook. This allows for quick identification of defensive gaps and areas with strong automation.
+                </Feature>
+            </div>
+            
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.2 - SOAR Playbook Version Control</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                 <Feature title="New! Playbook Versioning">
+                    Playbooks now have a full version history. Editing a playbook creates a new, timestamped version with change notes instead of overwriting, preserving all previous configurations for audit and rollback.
+                </Feature>
+                <Feature title="History & Rollback UI">
+                    A new "History" button on each playbook opens a modal to view all previous versions. From this view, you can see change notes and instantly revert to any older version by setting it as active.
+                </Feature>
+            </div>
 
             <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.1 - Documentation & Stability</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
@@ -57,12 +74,6 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
                 </Feature>
             </div>
             
-            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.0 - Automation & Orchestration</h4>
-            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                 <Feature title="New! SOAR Playbook Automation">
-                    A new "Automation" view has been added to the console. This provides a user-friendly interface to create and manage simple, trigger-based automation rules (playbooks) to orchestrate security responses (e.g., auto-create and assign cases).
-                </Feature>
-            </div>
         </main>
          <footer className="p-4 bg-gray-900/50 border-t border-gray-700 flex justify-end items-center gap-3">
             <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-500 rounded-md">

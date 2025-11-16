@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 
 export const DashboardIcon: React.FC = () => (
@@ -37,5 +38,11 @@ export const AutomationIcon: React.FC = () => (
         <path d="M16 12h8"/>
         <path d="M12 4l4 4-4 4"/>
         <path d="M12 8h8"/>
+    </svg>
+);
+
+export const MitreAttackIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M2 2h3v3H2V2zm0 4.5h3v3H2v-3zm0 4.5h3v3H2v-3zM6.5 2h3v3h-3V2zm0 4.5h3v3h-3v-3zm0 4.5h3v3h-3v-3zM11 2h3v3h-3V2zm0 4.5h3v3h-3v-3zm0 4.5h3v3h-3v-3z"/>
     </svg>
 );

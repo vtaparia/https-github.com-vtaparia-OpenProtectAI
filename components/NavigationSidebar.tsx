@@ -1,9 +1,10 @@
 
 
-import React from 'react';
-import { DashboardIcon, AgentIcon, ServerIcon, IncidentReviewIcon, AutomationIcon } from './icons/NavIcons';
 
-export type View = 'Dashboard' | 'Agent Fleet' | 'Server Intelligence' | 'Incident Review' | 'Automation';
+import React from 'react';
+import { DashboardIcon, AgentIcon, ServerIcon, IncidentReviewIcon, AutomationIcon, MitreAttackIcon } from './icons/NavIcons';
+
+export type View = 'Dashboard' | 'Agent Fleet' | 'Server Intelligence' | 'Incident Review' | 'MITRE ATT&CK' | 'Automation';
 
 interface NavigationSidebarProps {
   activeView: View;
@@ -53,6 +54,12 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
             label="Incident Review"
             isActive={activeView === 'Incident Review'}
             onClick={() => onViewChange('Incident Review')}
+        />
+        <NavItem 
+            icon={<MitreAttackIcon />}
+            label="MITRE ATT&CK"
+            isActive={activeView === 'MITRE ATT&CK'}
+            onClick={() => onViewChange('MITRE ATT&CK')}
         />
         <div className="border-t border-slate-700/50 my-2"></div>
         <NavItem 

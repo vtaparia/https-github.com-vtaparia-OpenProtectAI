@@ -1,9 +1,7 @@
 
-
-
-
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective, PlaybookVersion } from './types';
+// FIX: Added AgentUpgradeDirective to imports to allow for explicit typing.
+import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective, PlaybookVersion, AgentUpgradeDirective } from './types';
 import { getChatResponse, reinitializeChat, getActiveProvider } from './services/geminiService';
 import Header from './components/Header';
 import { sha256 } from './utils/hashing';
@@ -22,6 +20,7 @@ import AssignCaseModal from './components/AssignCaseModal';
 import ResolveCaseModal from './components/ResolveCaseModal';
 import IncidentReviewView from './components/IncidentReviewView';
 import AutomationView from './components/AutomationView';
+import MitreAttackView from './components/MitreAttackView';
 
 
 const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
@@ -227,11 +226,11 @@ const App: React.FC = () => {
             const newCases = new Map(prevCases);
             const existingCase = newCases.get(caseId);
             if (existingCase) {
-                newCases.set(caseId, { 
-                    ...existingCase, 
+                // FIX: Replaced spread operator with Object.assign to fix "Spread types may only be created from object types" error.
+                newCases.set(caseId, Object.assign({}, existingCase, {
                     assignee, 
                     status: CaseStatus.IN_PROGRESS 
-                });
+                }));
             }
             return newCases;
         });
@@ -281,7 +280,7 @@ const App: React.FC = () => {
     const processAlert = useCallback(async (alert: Alert) => {
         const sanitized_data: Record<string, any> = {};
         for (const [key, value] of Object.entries(alert.raw_data || {})) {
-            if (key === 'username') {
+            if (key === 'username' || key === 'user') {
                 sanitized_data['user_hash'] = await sha256(String(value));
             } else if (key === 'password_strength' && value === 'weak') {
                 sanitized_data[key] = value;
@@ -353,7 +352,8 @@ const App: React.FC = () => {
         if (alert.raw_data?.context) {
             const contextKey = `${alert.raw_data.context.industry}|${alert.raw_data.context.region}`;
             setContextualThreatTracker(prev => {
-                const newTracker = {...prev};
+                // FIX: Replaced spread operator with Object.assign to fix "Spread types may only be created from object types" error.
+                const newTracker = Object.assign({}, prev);
                 const current = newTracker[contextKey] || { count: 0, titles: new Set() };
                 current.count++;
                 current.titles.add(alert.title);
@@ -483,7 +483,8 @@ const App: React.FC = () => {
                     setServerEvents(prev => [...prev, proactiveAlert]);
                     logKnowledgeContribution(`Proactive Alert for ${industry}`, 1.2);
                     setContextualThreatTracker(prev => {
-                        const newTracker = {...prev};
+                        // FIX: Replaced spread operator with Object.assign to fix "Spread types may only be created from object types" error.
+                        const newTracker = Object.assign({}, prev);
                         delete newTracker[key];
                         return newTracker;
                     });
@@ -546,7 +547,8 @@ const App: React.FC = () => {
     }
 
     const handleInitiateUpgrade = (version: string, target_os: Device['os'] | 'All') => {
-        const directive = { type: 'AGENT_UPGRADE', version, target_os };
+        // FIX: Added explicit type `AgentUpgradeDirective` to ensure `type` property is a literal, not string.
+        const directive: AgentUpgradeDirective = { type: 'AGENT_UPGRADE', version, target_os };
         const pushEvent: ServerEvent = {
             id: `se-${Date.now()}-directive-upgrade`,
             type: 'DIRECTIVE_PUSH',
@@ -558,22 +560,23 @@ const App: React.FC = () => {
         setUpgradeModalOpen(false);
     };
 
-    const handleResolveCase = (caseId: string, notes: string) => {
+    // FIX: Wrapped handleResolveCase in useCallback for consistency and to fix a potential type error with the spread operator.
+    const handleResolveCase = useCallback((caseId: string, notes: string) => {
          setCases(prevCases => {
             const newCases = new Map(prevCases);
             const existingCase = newCases.get(caseId);
             if (existingCase) {
-                newCases.set(caseId, { 
-                    ...existingCase, 
+                // FIX: Replaced spread operator with Object.assign to fix "Spread types may only be created from object types" error.
+                newCases.set(caseId, Object.assign({}, existingCase, { 
                     resolution_notes: notes,
                     status: CaseStatus.RESOLVED,
                     resolved_at: new Date().toISOString(),
-                });
+                }));
             }
             return newCases;
         });
         setResolveModalInfo({ isOpen: false, caseId: null });
-    };
+    }, [setCases]);
 
     const renderMainView = () => {
         switch(activeView) {
@@ -604,6 +607,8 @@ const App: React.FC = () => {
                  return <ServerIntelligenceView events={serverEvents} onSelectItem={handleSelectItem} />;
             case 'Incident Review':
                  return <IncidentReviewView cases={cases} />;
+            case 'MITRE ATT&CK':
+                return <MitreAttackView alerts={alerts} playbooks={playbooks} />;
             case 'Automation':
                 const allMitreIds = Array.from(new Set(sampleAlerts.filter(a => a.mitre_mapping).map(a => a.mitre_mapping!.id)));
                 // FIX: Removed incorrect comment. The `uniqueMitreIds` prop is correctly defined and passed to the AutomationView component.
