@@ -15,7 +15,7 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 - **Persistent AI Assistant:** A collapsible chat panel provides constant access to the OpenProtectAI assistant for architectural questions, code generation, and deployment guidance without leaving the console.
 
 ### 2. Real-Time Endpoint Agent Simulation
-This agent monitors a computer system in real time. It collects running-process lists, CPU/memory usage, network activity, and system telemetry. It detects anomalies such as unusual CPU spikes, high memory usage, suspicious outbound traffic, or unknown processes. The agent sends alerts to the server and receives updated security rules, AI models, and behavior profiles. It analyzes process behavior locally and reports security-relevant events using structured JSON.
+The platform simulates endpoint agents that monitor systems in real time. They collect running-process lists, CPU/memory usage, network activity, and system telemetry to detect anomalies such as unusual CPU spikes, high memory usage, suspicious outbound traffic, or unsigned processes. Agents send alerts with structured JSON to the local LWServer for aggregation before forwarding them to the central cloud platform. In return, they receive updated security rules, AI models, and behavior profiles.
 
 ### 3. SOAR Playbook Automation
 - **Automation Workspace:** A dedicated "Automation" view provides a user-friendly interface to create, edit, and manage simple, trigger-based automation rules (playbooks).

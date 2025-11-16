@@ -29,20 +29,30 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.9.4</h2>
+          <h2 className="text-xl font-bold">What's New in v1.9.5</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">Documentation & Clarity Update</h3>
+            <h3 className="text-lg font-bold text-gray-100">Enhanced Agent Simulation & Detections</h3>
             
-            <Feature title="Enhanced Agent Description">
-                The README has been updated with a detailed description of the simulated agent's real-time monitoring capabilities, including process collection, anomaly detection, and local analysis.
+            <Feature title="New Detection Scenarios">
+                The agent simulation is now more robust, generating alerts for new real-world threat scenarios like Resource Hijacking (cryptomining), high memory usage by unsigned processes, and potential data exfiltration patterns. This provides a richer dataset for analysis and playbook development.
+            </Feature>
+             <Feature title="Documentation Update">
+                The README has been updated to reflect the agent's enhanced capabilities, providing a clearer picture of the end-to-end data flow from endpoint to cloud.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
+            
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.4 - Documentation & Clarity Update</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                <Feature title="Enhanced Agent Description">
+                    The README has been updated with a detailed description of the simulated agent's real-time monitoring capabilities, including process collection, anomaly detection, and local analysis.
+                </Feature>
+            </div>
 
             <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.3 - MITRE ATT&CK® Framework Integration</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">

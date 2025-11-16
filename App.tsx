@@ -111,6 +111,52 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             context: { industry: 'Retail', country: 'Australia', continent: 'Australia', region: 'APAC' }
         }
     },
+    {
+        severity: AlertSeverity.HIGH,
+        title: 'Anomalous CPU Usage Spike',
+        description: 'Process "graphics-driver-update.exe" consumed 98% CPU for over 60 seconds.',
+        raw_data: {
+            process: 'graphics-driver-update.exe',
+            process_path: 'C:\\Users\\admin\\AppData\\Local\\Temp\\',
+            cpu_usage_peak: '98%',
+            duration_seconds: 75,
+            type: 'cpu_anomaly',
+            device: { type: 'Desktop', os: 'Windows', hostname: 'MKTG-PC-08', ip_address: '10.1.7.21', last_seen: '3m ago', agent_version: '3.1.2', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
+            context: { industry: 'Retail', country: 'Canada', continent: 'North America', region: 'NA-East' }
+        },
+        mitre_mapping: { tactic: 'Impact', technique: 'Resource Hijacking', id: 'T1496' }
+    },
+    {
+        severity: AlertSeverity.MEDIUM,
+        title: 'High Memory Usage by Unsigned Process',
+        description: 'An unsigned process "audiosrv.exe" is consuming an unusually large amount of memory.',
+        raw_data: {
+            process: 'audiosrv.exe',
+            process_path: 'C:\\Windows\\Temp\\audiosrv.exe',
+            memory_usage_mb: 850,
+            is_signed: false,
+            parent_process: 'explorer.exe',
+            device: { type: 'Laptop', os: 'Windows', hostname: 'SALES-LT-15', ip_address: '10.1.8.102', last_seen: '15m ago', agent_version: '3.1.2', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Online' },
+            context: { industry: 'Financial', country: 'USA', continent: 'North America', region: 'NA-West' }
+        },
+        mitre_mapping: { tactic: 'Execution', technique: 'Scheduled Task/Job', id: 'T1053' }
+    },
+    {
+        severity: AlertSeverity.HIGH,
+        title: 'Potential Data Exfiltration',
+        description: 'Unusual outbound network traffic pattern detected from a database server.',
+        raw_data: {
+            process: 'postgres.exe',
+            outbound_bytes: 52428800,
+            destination_port: 8443,
+            destination_ip: '45.77.53.192',
+            protocol: 'TCP',
+            pattern: 'sustained_high_volume_upload',
+            device: { type: 'Server', os: 'Linux', hostname: 'DB-SRV-02', ip_address: '172.16.40.11', last_seen: '1m ago', agent_version: '3.2.0', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
+            context: { industry: 'Healthcare', country: 'USA', continent: 'North America', region: 'NA-Central' }
+        },
+        mitre_mapping: { tactic: 'Exfiltration', technique: 'Exfiltration Over C2 Channel', id: 'T1041' }
+    }
 ];
 
 const externalIntelSources: (Omit<LearningUpdate, 'details' | 'mitre_mapping'> & { mitre_mapping?: MitreMapping })[] = [

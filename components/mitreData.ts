@@ -58,11 +58,20 @@ export const mitreMatrix: Tactic[] = [
         ]
     },
     {
+        id: 'TA0010',
+        name: 'Exfiltration',
+        techniques: [
+            { id: 'T1041', name: 'Exfiltration Over C2 Channel' },
+            { id: 'T1048', name: 'Exfiltration Over Alternative Protocol' },
+        ]
+    },
+    {
         id: 'TA0040',
         name: 'Impact',
         techniques: [
             { id: 'T1486', name: 'Data Encrypted for Impact' },
             { id: 'T1490', name: 'Inhibit System Recovery' },
+            { id: 'T1496', name: 'Resource Hijacking' },
         ]
     },
 ];
