@@ -219,9 +219,49 @@ const initialPlaybooks: Playbook[] = [
             }
         ]
     },
+    {
+        id: 'playbook-2',
+        name: 'Investigate Anomalous Network Connections',
+        description: 'Automatically creates and assigns a case for suspicious outbound network traffic.',
+        is_active: true,
+        activeVersionId: 'pv-2-initial',
+        versions: [
+            {
+                versionId: 'pv-2-initial',
+                createdAt: '2024-07-25T10:00:00.000Z',
+                author: 'SOC Analyst',
+                notes: 'Initial version to automatically investigate suspicious outbound network traffic.',
+                trigger: { field: 'title', operator: 'is', value: 'Anomalous Network Connection' },
+                actions: [
+                    { type: 'CREATE_CASE' },
+                    { type: 'ASSIGN_CASE', params: { assignee: 'Tier 2 SOC' } },
+                ],
+            }
+        ]
+    },
+    {
+        id: 'playbook-3',
+        name: 'Block Phishing Link Access',
+        description: 'Automatically isolates mobile devices that access known phishing links to prevent further compromise.',
+        is_active: true,
+        activeVersionId: 'pv-3-initial',
+        versions: [
+            {
+                versionId: 'pv-3-initial',
+                createdAt: '2024-07-25T10:05:00.000Z',
+                author: 'SOC Analyst',
+                notes: 'Initial version to automatically isolate mobile devices that access known phishing links.',
+                trigger: { field: 'title', operator: 'is', value: 'Mobile Phishing Link Access' },
+                actions: [
+                    { type: 'ISOLATE_HOST' },
+                ],
+            }
+        ]
+    }
 ];
 
 const App: React.FC = () => {
+    // FIX: Added missing '=' to correct the useState declaration syntax, resolving multiple downstream type errors.
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -314,7 +354,22 @@ const App: React.FC = () => {
                         actionsTaken.push(`Case Assigned to ${action.params.assignee}`);
                     }
                     break;
-                // Add more actions here in the future
+                case 'ISOLATE_HOST': {
+                    const remediationEvent: ServerEvent = {
+                        id: `se-${Date.now()}-remediate-playbook`,
+                        type: 'AUTOMATED_REMEDIATION',
+                        timestamp: new Date().toISOString(),
+                        payload: {
+                            threat_name: alert.title,
+                            actions_taken: ['Isolate Host'],
+                            target_host: alert.raw_data?.device.hostname || 'Unknown',
+                        } as AutomatedRemediation
+                    };
+                    setServerEvents(prev => [...prev, remediationEvent]);
+                    actionsTaken.push('Host Isolated');
+                    logKnowledgeContribution(`Playbook Isolated Host: ${alert.raw_data?.device.hostname}`, 1.0);
+                    break;
+                }
             }
         });
 
