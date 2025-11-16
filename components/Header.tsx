@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ onVersionClick, themeStyles }) => {
             </div>
         </div>
         <button onClick={onVersionClick} className={`text-xs font-mono px-2 py-1 rounded-md transition-colors ${themeStyles.buttonSecondary}`}>
-            v1.9.7
+            v1.9.8
         </button>
     </header>
   );

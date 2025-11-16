@@ -18,6 +18,7 @@ export const mitreMatrix: Tactic[] = [
         techniques: [
             { id: 'T1027', name: 'Obfuscated Files or Information' },
             { id: 'T1070', name: 'Indicator Removal' },
+            { id: 'T1036', name: 'Masquerading' },
         ]
     },
     {

@@ -15,10 +15,10 @@ This project demonstrates a sophisticated "single pane of glass" UI for monitori
 - **Persistent AI Assistant:** A collapsible chat panel provides constant access to the OpenProtectAI assistant for architectural questions, code generation, and deployment guidance without leaving the console.
 
 ### 2. Intelligent Real-Time Endpoint Agent
-The platform's agents provide deep, real-time visibility by performing intelligent, localized analysis. Each agent establishes a baseline of normal behavior for its host, monitoring process execution, CPU/memory utilization, and network activity. It detects anomalies by comparing current activity against this historical baseline and against aggregated intelligence from the LWServer, which provides context from peer devices. This allows the agent to proactively identify threats such as:
-- **Resource Abuse:** A process consuming abnormal CPU or memory compared to its own history or similar processes across the fleet.
-- **Anomalous Network Patterns:** Suspicious outbound traffic that deviates from established norms.
-- **Ransomware Behavior:** The agent detects patterns of rapid, mass file modification, a key indicator of ransomware or wiper malware, and can trigger an immediate alert.
+The platform's agents provide deep, real-time visibility by performing intelligent, localized analysis. Each agent establishes a dynamic baseline of normal behavior for its host by monitoring **process start times, parent-child relationships**, CPU/memory utilization, and network activity over time. It then detects anomalies by comparing current activity against this **rich historical context** and against aggregated intelligence from the LWServer, which provides context from peer devices across the network. This allows the agent to proactively identify and alert on threats such as:
+- **Behavioral Resource Abuse:** A process consuming an abnormal amount of CPU or memory compared to its own history or similar processes across the fleet, with added context from its parent process.
+- **Anomalous Network Patterns:** Suspicious outbound traffic that deviates from established norms, potentially indicating C2 communication or data exfiltration.
+- **Ransomware & Worm-like Behavior:** The agent's local analysis engine uses **refined heuristics** to detect patterns of rapid, mass file modification across the filesystem. It's designed to distinguish between legitimate high-volume I/O and malicious encryption patterns, triggering immediate, high-priority alerts for ransomware or wiper malware.
 
 Security-relevant events are reported as structured JSON alerts, providing rich context for the central server's learning engine. Agents also receive updated security rules, AI models, and behavioral profiles from the server to continuously enhance their local detection capabilities.
 

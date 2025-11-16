@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 // FIX: Added AgentUpgradeDirective to imports to allow for explicit typing.
 import { ChatMessage, MessageRole, Alert, ServerEvent, AggregatedEvent, LearningUpdate, ProactiveAlertPush, AllEventTypes, DirectivePush, KnowledgeSync, LearningSource, KnowledgeContribution, AutomatedRemediation, Device, AlertSeverity, CaseStatus, Case, Playbook, MitreMapping, YaraRuleUpdateDirective, PlaybookVersion, AgentUpgradeDirective, PlaybookTrigger, PlaybookCondition } from './types';
@@ -158,6 +159,21 @@ const sampleAlerts: Omit<Alert, 'id' | 'timestamp'>[] = [
             context: { industry: 'Healthcare', country: 'USA', continent: 'North America', region: 'NA-Central' }
         },
         mitre_mapping: { tactic: 'Exfiltration', technique: 'Exfiltration Over C2 Channel', id: 'T1041' }
+    },
+    {
+        severity: AlertSeverity.HIGH,
+        title: 'Suspicious File Modification by System Process',
+        description: 'svchost.exe initiated rapid writes to multiple non-system directories, deviating from its established baseline.',
+        raw_data: {
+            process: 'svchost.exe',
+            parent_process: 'services.exe',
+            modified_dirs: ['C:\\Users\\admin\\Documents', 'C:\\Users\\admin\\Downloads'],
+            file_count: 50,
+            pattern: 'scattered_writes.abnormal_location',
+            device: { type: 'Desktop', os: 'Windows', hostname: 'FINANCE-PC-01', ip_address: '10.1.5.112', last_seen: '8m ago', agent_version: '3.2.1', firewall_status: 'Enabled', disk_encryption: 'Enabled', status: 'Alerting' },
+            context: { industry: 'Financial', country: 'USA', continent: 'North America', region: 'NA-East' }
+        },
+        mitre_mapping: { tactic: 'Defense Evasion', technique: 'Masquerading', id: 'T1036' }
     }
 ];
 
@@ -289,7 +305,6 @@ const evaluateCondition = (condition: PlaybookCondition, alert: Alert): boolean 
     return operator === 'is' ? match : !match;
 };
 
-// FIX: The `useMemo` hook requires a dependency array. Added an empty array to ensure it only runs once.
 const evaluateTrigger = (trigger: PlaybookTrigger, alert: Alert): boolean => {
     if (trigger.conditions.length === 0) return false;
 
@@ -337,7 +352,6 @@ const App: React.FC = () => {
     const themeStyles = useMemo(() => getThemeStyles(theme, density), [theme, density]);
     
     // FIX: Memoize the active provider to avoid calling the function on every render.
-    // FIX: The useMemo hook requires a dependency array. Added an empty array to ensure it only runs once.
     // FIX: Corrected useMemo syntax by wrapping getActiveProvider in an arrow function to resolve a type inference issue.
     const activeProvider = useMemo(() => getActiveProvider(), []);
     

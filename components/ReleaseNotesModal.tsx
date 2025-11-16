@@ -29,23 +29,36 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         onClick={e => e.stopPropagation()}
       >
         <header className="p-4 border-b border-gray-700 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold">What's New in v1.9.7</h2>
+          <h2 className="text-xl font-bold">What's New in v1.9.8</h2>
           <button onClick={onClose} className="text-2xl font-light p-1 rounded-full leading-none hover:bg-gray-700">&times;</button>
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">Smarter Agent Intelligence & Proactive Detection</h3>
+            <h3 className="text-lg font-bold text-gray-100">Advanced Agent Baselining & Heuristics</h3>
             
-            <Feature title="Behavioral Anomaly Detection">
-                Agents are now smarter, establishing dynamic baselines for CPU, memory, and network usage on each host. They can now detect and alert on abnormal resource consumption by comparing real-time activity against historical data and fleet-wide intelligence.
+            <Feature title="Dynamic Process Monitoring">
+                Agents now track process start times and parent-child relationships, enhancing the contextual data available for resource consumption anomalies and improving investigation accuracy.
             </Feature>
-             <Feature title="Proactive Ransomware & Worm Detection">
-                The agent's local analysis engine can now identify patterns of rapid, mass file modification. This allows for the early detection of ransomware and worm-like activity before widespread damage occurs.
+            <Feature title="Contextual Anomaly Detection">
+                The agent's intelligence is improved. Anomaly detection for CPU, memory, and network usage now more heavily weighs a process's historical behavior and fleet-wide intelligence from the server to reduce false positives.
+            </Feature>
+             <Feature title="Enhanced Ransomware Heuristics">
+                The file-write monitoring logic has been refined to better distinguish between legitimate high-volume I/O (like backups) and malicious encryption patterns, improving the fidelity of ransomware alerts.
             </Feature>
 
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
+
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.7 - Smarter Agent Intelligence & Proactive Detection</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                <Feature title="Behavioral Anomaly Detection">
+                    Agents are now smarter, establishing dynamic baselines for CPU, memory, and network usage on each host. They can now detect and alert on abnormal resource consumption by comparing real-time activity against historical data and fleet-wide intelligence.
+                </Feature>
+                <Feature title="Proactive Ransomware & Worm Detection">
+                    The agent's local analysis engine can now identify patterns of rapid, mass file modification. This allows for the early detection of ransomware and worm-like activity before widespread damage occurs.
+                </Feature>
+            </div>
             
             <h4 className="text-md font-semibold text-gray-300 mt-2">v1.9.6 - Advanced SOAR Playbook Triggers</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
