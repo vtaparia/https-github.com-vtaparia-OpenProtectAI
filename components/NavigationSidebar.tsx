@@ -56,17 +56,16 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
             onClick={() => onViewChange('Incident Review')}
         />
         <NavItem 
-            icon={<MitreAttackIcon />}
-            label="MITRE ATT&CK"
-            isActive={activeView === 'MITRE ATT&CK'}
-            onClick={() => onViewChange('MITRE ATT&CK')}
-        />
-        <div className="border-t border-slate-700/50 my-2"></div>
-        <NavItem 
             icon={<AutomationIcon />}
             label="Automation"
             isActive={activeView === 'Automation'}
             onClick={() => onViewChange('Automation')}
+        />
+        <NavItem 
+            icon={<MitreAttackIcon />}
+            label="MITRE ATT&CK"
+            isActive={activeView === 'MITRE ATT&CK'}
+            onClick={() => onViewChange('MITRE ATT&CK')}
         />
     </nav>
   );
