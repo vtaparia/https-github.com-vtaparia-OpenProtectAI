@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { AllEventTypes, Alert, ServerEvent, AggregatedEvent, LearningUpdate, DirectivePush, KnowledgeSync, ProactiveAlertPush, VulnerabilityDetails, AutomatedRemediation, PlaybookTriggered, MitreMapping } from '../types';
 import PayloadDetailsView from './PayloadDetailsView';
@@ -116,7 +114,18 @@ const DetailView: React.FC<DetailViewProps> = ({ item, onReturn }) => {
                              <p className="text-sm text-gray-400 mb-4">Playbook "{payload.playbook_name}" was executed in response to an alert.</p>
                              <div className="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
                                 <h4 className="text-sm font-semibold text-gray-400 mb-2">Execution Details</h4>
-                                <PayloadDetailsView payload={payload} />
+                                <div className="text-sm space-y-1 font-mono">
+                                    <DetailRow label="Playbook Name" value={payload.playbook_name} />
+                                    <DetailRow label="Triggering Alert" value={payload.triggered_by_alert_title} />
+                                    <DetailRow label="Target Host" value={payload.target_host} />
+                                    <DetailRow label="Actions Taken">
+                                        <ul className="list-disc list-inside mt-1 text-gray-200">
+                                            {payload.actions_taken.map((action, index) => (
+                                                <li key={index}>{action}</li>
+                                            ))}
+                                        </ul>
+                                    </DetailRow>
+                                </div>
                              </div>
                         </div>
                     );

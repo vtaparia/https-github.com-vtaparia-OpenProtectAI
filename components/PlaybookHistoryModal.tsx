@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Playbook, PlaybookVersion } from '../types';
 import { HistoryIcon } from './icons/HistoryIcon';
@@ -17,13 +16,18 @@ const VersionDetails: React.FC<{ version: PlaybookVersion }> = ({ version }) => 
         </div>
         <div>
             <h5 className="font-semibold text-gray-300">Actions</h5>
-            <ul className="list-disc list-inside font-mono text-gray-400">
-                {version.actions.map((action, index) => (
-                    <li key={index}>
-                        {action.type}
-                        {action.params?.assignee && ` (to: ${action.params.assignee})`}
-                    </li>
-                ))}
+            <ul className="list-disc list-inside font-mono text-gray-400 space-y-1">
+                {version.actions.map((action, index) => {
+                    const paramsString = action.params && Object.keys(action.params).length > 0
+                        ? `(${Object.entries(action.params).map(([key, value]) => `${key}: "${value}"`).join(', ')})`
+                        : '';
+                    return (
+                        <li key={index}>
+                            {action.type}
+                            {paramsString && <span className="text-gray-500 ml-2">{paramsString}</span>}
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     </div>
