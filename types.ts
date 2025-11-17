@@ -74,10 +74,11 @@ export interface MitreMapping {
 
 export interface Alert {
   id: string;
+  // FIX: Add missing timestamp property to the Alert interface to resolve type errors across the application.
+  timestamp: string;
   severity: AlertSeverity;
   title: string;
   description: string;
-  timestamp: string;
   raw_data?: Record<string, any> & { device: Device; context: AlertContext }; 
   caseId?: string;
   mitre_mapping?: MitreMapping;

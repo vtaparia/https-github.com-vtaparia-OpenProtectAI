@@ -34,18 +34,28 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
         </header>
 
         <main className="p-6 flex-1 overflow-y-auto space-y-4">
-            <h3 className="text-lg font-bold text-gray-100">Hardened Communication Channels (E2E TLS)</h3>
+            <h3 className="text-lg font-bold text-gray-100">Architectural Upgrade: AI-Powered Central Brain</h3>
             
-            <Feature title="End-to-End Encryption Hardening">
-                Re-validated and hardened the mutual TLS (mTLS) implementation across all communication channels (Agent ↔ LWServer ↔ Central Server). This ensures all telemetry, directives, and intelligence updates are fully encrypted in transit.
+            <Feature title="Global Intelligence Fusion">
+                The server's learning engine has been upgraded to ingest and correlate data from a wider security ecosystem, including CrowdStrike, SentinelOne, Zeek, and OSQuery. This makes the "Server Intelligence" feed more diverse and powerful.
             </Feature>
-            <Feature title="Zero Trust Policy Enforcement">
-                The platform's communication fabric now strictly enforces a Zero Trust security model, where no component is trusted by default and must present a valid client certificate to authenticate, protecting against eavesdropping and man-in-the-middle attacks.
+            <Feature title="Global Knowledge Graph Visualization">
+                A new "Global Knowledge Graph" panel has been added to the Dashboard. This visualization illustrates how the server's AI brain connects disparate security entities (like CVEs, IPs, and processes) into a single, coherent threat picture.
+            </Feature>
+            <Feature title="Continuous Learning Loop">
+                The platform's architecture now fully embodies a continuous learning loop: agents provide telemetry, the server's AI brain learns from it, and improved intelligence is pushed back to the entire fleet, making the system smarter over time.
             </Feature>
             
             <div className="border-t border-slate-700 my-6"></div>
 
             <h3 className="text-lg font-bold text-gray-100">Previous Versions</h3>
+            
+            <h4 className="text-md font-semibold text-gray-300 mt-2">v2.0.4 - Hardened Communication Channels (E2E TLS)</h4>
+            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
+                <Feature title="End-to-End Encryption Hardening">
+                    Re-validated and hardened the mutual TLS (mTLS) implementation across all communication channels (Agent ↔ LWServer ↔ Central Server). This ensures all telemetry, directives, and intelligence updates are fully encrypted in transit.
+                </Feature>
+            </div>
             
              <h4 className="text-md font-semibold text-gray-300 mt-2">v2.0.3 - IP Protection & Branding</h4>
             <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
@@ -61,20 +71,6 @@ const ReleaseNotesModal: React.FC<ReleaseNotesModalProps> = ({ isOpen, onClose }
                 </Feature>
                 <Feature title="SOAR Action: Outbound Notifications">
                     Playbooks can now be configured to send real-time notifications to external systems, including Slack, MS Teams, and Email.
-                </Feature>
-            </div>
-
-            <h4 className="text-md font-semibold text-gray-300 mt-2">v2.0.1 - LWServer Fleet Management</h4>
-            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="Architectural Visibility">
-                    A new "LWServer Fleet" view provides a real-time dashboard of all deployed LWServers, visualizing the critical middle tier of the platform's architecture.
-                </Feature>
-            </div>
-            
-            <h4 className="text-md font-semibold text-gray-300 mt-2">v2.0.0 - Zero Trust Communication Fabric</h4>
-            <div className="space-y-2 mt-2 pl-2 border-l-2 border-slate-700">
-                <Feature title="End-to-End Encryption (mTLS)">
-                    All communication between agents, LWServers, and the central cloud platform is now secured using a Zero Trust model with mutual TLS (mTLS).
                 </Feature>
             </div>
         </main>
